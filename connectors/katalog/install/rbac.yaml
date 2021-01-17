@@ -1,3 +1,5 @@
+# Copyright 2021 IBM Corp.
+# SPDX-License-Identifier: Apache-2.0
 ---
 # ClusterRole katalog-editor allows users to manage assets.
 kind: ClusterRole
@@ -7,6 +9,9 @@ metadata:
 rules:
 - apiGroups: ["katalog.m4d.ibm.com"]
   resources: ["assets"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete", "deletecollection"]
+- apiGroups: [""]
+  resources: ["secret"]
   verbs: ["get", "list", "watch", "create", "update", "patch", "delete", "deletecollection"]
 ---
 # ClusterRole katalog-viewer allows viewing assets.

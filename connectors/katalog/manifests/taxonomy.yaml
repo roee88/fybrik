@@ -1,6 +1,8 @@
+# Copyright 2021 IBM Corp.
+# SPDX-License-Identifier: Apache-2.0
 openapi: 3.0.1
 info:
-  title: Taxonomy
+  title: Taxonomy # not really
   version: v0.0.1
 components:
   schemas:
@@ -46,14 +48,14 @@ components:
           type: string
         endpoint:
           type: string
-        object_key:
+        objectKey:
           type: string
         region:
           type: string
       required:
       - bucket
       - endpoint
-      - object_key
+      - objectKey
     DB2:
       type: object
       properties:

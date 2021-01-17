@@ -60,20 +60,21 @@ spec:
                             type: string
                         type: object
                       s3:
-                        description: Connection information for S3 compatible object store
+                        description: Connection information for S3 compatible object
+                          store
                         properties:
                           bucket:
                             type: string
                           endpoint:
                             type: string
-                          object_key:
+                          objectKey:
                             type: string
                           region:
                             type: string
                         required:
                         - bucket
                         - endpoint
-                        - object_key
+                        - objectKey
                         type: object
                       type:
                         enum:
@@ -84,34 +85,41 @@ spec:
                     required:
                     - type
                     type: object
-                  data_format:
+                  dataFormat:
                     type: string
                 required:
                 - connection
                 type: object
               secretRef:
-                description: Reference to a Secret resource holding credentials for this asset
+                description: Reference to a Secret resource holding credentials for
+                  this asset
                 properties:
                   name:
-                    description: Name of the Secret resource (must exist in the same namespace)
+                    description: Name of the Secret resource (must exist in the same
+                      namespace)
                     type: string
                 required:
                 - name
                 type: object
               security:
                 properties:
-                  components_metadata:
+                  componentsMetadata:
                     additionalProperties:
                       properties:
-                        component_type:
+                        componentType:
                           type: string
-                        named_metadata:
+                        namedMetadata:
                           additionalProperties:
                             type: string
-                          description: 'Named terms, that exist in Catalog toxonomy and the values for these terms for columns we will have "SchemaDetails" key, that will include technical schema details for this column TODO: Consider create special field for schema outside of metadata'
+                          description: 'Named terms, that exist in Catalog toxonomy
+                            and the values for these terms for columns we will have
+                            "SchemaDetails" key, that will include technical schema
+                            details for this column TODO: Consider create special
+                            field for schema outside of metadata'
                           type: object
                         tags:
-                          description: Tags - can be any free text added to a component (no taxonomy)
+                          description: Tags - can be any free text added to a component
+                            (no taxonomy)
                           items:
                             type: string
                           type: array
@@ -120,7 +128,7 @@ spec:
                     type: object
                   geography:
                     type: string
-                  named_metadata:
+                  namedMetadata:
                     additionalProperties:
                       type: string
                     type: object

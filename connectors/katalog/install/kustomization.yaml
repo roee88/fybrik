@@ -1,0 +1,13 @@
+# Copyright 2021 IBM Corp.
+# SPDX-License-Identifier: Apache-2.0
+
+resources:
+- connector.yaml
+- crds.gen.yaml
+- rbac.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+images:
+- name: katalog-connector
+  newName: ghcr.io/the-mesh-for-data/katalog-connector
+  newTag: latest

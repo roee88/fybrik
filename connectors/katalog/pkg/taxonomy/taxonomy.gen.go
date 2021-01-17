@@ -58,6 +58,6 @@ type Kafka struct {
 type S3 struct {
 	Bucket    string  `json:"bucket"`
 	Endpoint  string  `json:"endpoint"`
-	ObjectKey string  `json:"object_key"`
+	ObjectKey string  `json:"objectKey"`
 	Region    *string `json:"region,omitempty"`
 }

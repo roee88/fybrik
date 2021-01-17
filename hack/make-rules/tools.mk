@@ -109,6 +109,21 @@ $(TOOLBIN)/vault:
 	cd $(TOOLS_DIR); ./install_vault.sh
 	$(call post-install-check)
 
+INSTALL_TOOLS += $(TOOLBIN)/oapi-codegen
+$(TOOLBIN)/oapi-codegen:
+	GOBIN=$(ABSTOOLBIN) GO111MODULE=on go get github.com/deepmap/oapi-codegen/cmd/oapi-codegen@v1.4.2
+	$(call post-install-check)
+
+INSTALL_TOOLS += $(TOOLBIN)/openapi2crd
+$(TOOLBIN)/openapi2crd:
+	GOBIN=$(ABSTOOLBIN) GO111MODULE=on go get github.com/mesh-for-data/openapi2crd
+	$(call post-install-check)
+
+INSTALL_TOOLS += $(TOOLBIN)/crdoc
+$(TOOLBIN)/crdoc:
+	GOBIN=$(ABSTOOLBIN) GO111MODULE=on go get github.com/mesh-for-data/crdoc
+	$(call post-install-check)
+
 .PHONY: install-tools
 install-tools: $(INSTALL_TOOLS)
 	go mod tidy

@@ -21,16 +21,16 @@ type AssetDetails struct {
 
 	// Connection information
 	Connection externalRef0.Connection `json:"connection"`
-	DataFormat *string                 `json:"data_format,omitempty"`
+	DataFormat *string                 `json:"dataFormat,omitempty"`
 }
 
 // AssetMetadata defines model for AssetMetadata.
 type AssetMetadata struct {
 
 	// metadata for each component in asset (e.g., column)
-	ComponentsMetadata *AssetMetadata_ComponentsMetadata `json:"components_metadata,omitempty"`
+	ComponentsMetadata *AssetMetadata_ComponentsMetadata `json:"componentsMetadata,omitempty"`
 	Geography          *string                           `json:"geography,omitempty"`
-	NamedMetadata      *AssetMetadata_NamedMetadata      `json:"named_metadata,omitempty"`
+	NamedMetadata      *AssetMetadata_NamedMetadata      `json:"namedMetadata,omitempty"`
 	Owner              *string                           `json:"owner,omitempty"`
 
 	// Tags associated with the asset
@@ -60,10 +60,10 @@ type AssetSpec struct {
 
 // ComponentMetadata defines model for ComponentMetadata.
 type ComponentMetadata struct {
-	ComponentType *string `json:"component_type,omitempty"`
+	ComponentType *string `json:"componentType,omitempty"`
 
 	// Named terms, that exist in Catalog toxonomy and the values for these terms for columns we will have "SchemaDetails" key, that will include technical schema details for this column TODO: Consider create special field for schema outside of metadata
-	NamedMetadata *ComponentMetadata_NamedMetadata `json:"named_metadata,omitempty"`
+	NamedMetadata *ComponentMetadata_NamedMetadata `json:"namedMetadata,omitempty"`
 
 	// Tags - can be any free text added to a component (no taxonomy)
 	Tags *[]string `json:"tags,omitempty"`
