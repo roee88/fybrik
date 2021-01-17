@@ -9,7 +9,7 @@ import (
 	"github.com/ibm/the-mesh-for-data/connectors/katalog/pkg/connector"
 )
 
-//go:generate openapi2crd manifests/spec.yaml -g katalog.m4d.ibm.com/v1alpha1/Asset -g katalog.m4d.ibm.com/v1alpha1/Credentials -o install/crds.yaml
+//go:generate openapi2crd manifests/spec.yaml -g katalog.m4d.ibm.com/v1alpha1/Asset -g katalog.m4d.ibm.com/v1alpha1/Credentials -o install/crds.gen.yaml
 //go:generate oapi-codegen -generate "types,skip-prune" -package taxonomy -o pkg/taxonomy/taxonomy.gen.go ./manifests/taxonomy.yaml
 //go:generate oapi-codegen -generate "types,skip-prune" -import-mapping=taxonomy.yaml:github.com/ibm/the-mesh-for-data/connectors/katalog/pkg/taxonomy -package api -o pkg/api/spec.gen.go ./manifests/spec.yaml
 

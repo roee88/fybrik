@@ -76,12 +76,13 @@ spec:
                         - object_key
                         type: object
                       type:
-                        description: Type is the discriminator for the different possible values
                         enum:
                         - s3
                         - db2
                         - kafka
                         type: string
+                    required:
+                    - type
                     type: object
                   data_format:
                     type: string
@@ -166,20 +167,43 @@ spec:
       openAPIV3Schema:
         properties:
           spec:
+            description: Authentication method
             properties:
-              accessKey:
-                description: The access key is also known as AccessKeyId
-                type: string
+              accessKeys:
+                description: Authentication using access key and secret key
+                properties:
+                  accessKey:
+                    description: The access key is also known as AccessKeyId
+                    type: string
+                  secretKey:
+                    description: The secret key is also known as SecretAccessKey
+                    type: string
+                required:
+                - accessKey
+                - secretKey
+                type: object
               apiKey:
                 description: API key used in various IAM enabled services
                 type: string
-              password:
+              basic:
+                description: Authentication using username and password
+                properties:
+                  password:
+                    type: string
+                  username:
+                    type: string
+                required:
+                - username
+                - password
+                type: object
+              type:
+                enum:
+                - basic
+                - accessKeys
+                - apiKey
                 type: string
-              secretKey:
-                description: The secret key is also known as SecretAccessKey
-                type: string
-              username:
-                type: string
+            required:
+            - type
             type: object
         required:
         - spec

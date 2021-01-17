@@ -4,30 +4,86 @@ info:
   version: v0.0.1
 components:
   schemas:
+    # Authentication:
+    #   type: object
+    #   properties:
+    #     username:
+    #       description: Username for basic authentication
+    #       type: string
+    #     password:
+    #       description: Password for basic authentication
+    #       type: string
+    #     apiKey:
+    #       description: API key used in various IAM enabled services
+    #       type: string
+    #     accessKey:
+    #       description: Access key also known as AccessKeyId
+    #       type: string
+    #     secretKey:
+    #       description: Secret key also known as SecretAccessKey
+    #       type: string
+      # oneOf:
+      # - required: [username, password]
+      # - required: [apiKey]
+      # - required: [accessKey, secretKey]
     Authentication:
+      description: "Authentication method"
       type: object
       properties:
+        type:
+          type: string
+          enum: ["basic", "accessKeys", "apiKey"]
+        basic:
+          $ref: '#/components/schemas/BasicAuthentication'
+        accessKeys:
+          $ref: '#/components/schemas/AccessKeysAuthentication'
         apiKey:
           description: API key used in various IAM enabled services
           type: string
+      required:
+      - type
+    AccessKeysAuthentication:
+      description: Authentication using access key and secret key
+      type: object
+      properties:
         accessKey:
           description: The access key is also known as AccessKeyId
           type: string
         secretKey:
           description: The secret key is also known as SecretAccessKey
           type: string
+      required:
+      - accessKey
+      - secretKey
+    BasicAuthentication:
+      description: Authentication using username and password
+      type: object
+      properties:
         username:
           type: string
         password:
           type: string
+      required:
+      - username
+      - password
     Connection:
       description: Connection information
-      oneOf:
-        - $ref: '#/components/schemas/S3'
-        - $ref: '#/components/schemas/DB2'
-        - $ref: '#/components/schemas/Kafka'
+      type: object
+      properties:
+        type:
+          type: string
+          enum: ["s3", "db2", "kafka"]
+        s3:
+          $ref: '#/components/schemas/S3'
+        db2:
+          $ref: '#/components/schemas/DB2'
+        kafka:
+          $ref: '#/components/schemas/Kafka'
+      required:
+      - type
     S3:
       description: Connection information for S3 compatible object store
+      type: object
       properties:
         bucket:
           type: string
@@ -37,12 +93,12 @@ components:
           type: string
         region:
           type: string
-      type: object
       required:
       - bucket
       - endpoint
       - object_key
     DB2:
+      type: object
       properties:
         database:
           type: string
@@ -54,8 +110,8 @@ components:
           type: string
         url:
           type: string
-      type: object
     Kafka:
+      type: object
       properties:
         bootstrap_servers:
           type: string
@@ -75,4 +131,3 @@ components:
           type: string
         value_deserializer:
           type: string
-      type: object

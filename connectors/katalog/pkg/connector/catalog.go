@@ -6,7 +6,6 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/ibm/the-mesh-for-data/connectors/katalog/pkg/taxonomy"
 	connectors "github.com/ibm/the-mesh-for-data/pkg/connectors/protobuf"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -80,57 +79,45 @@ func buildDatasetMetadata(asset *Asset) *connectors.DatasetMetadata {
 }
 
 func builDataStore(asset *Asset) (*connectors.DataStore, error) {
-	connection := asset.Spec.Details.Connection.(map[string]interface{})
-	switch connectionType := connection["type"].(string); connectionType {
+	connection := asset.Spec.Details.Connection
+	switch connection.Type {
 	case "s3":
-		s3 := &taxonomy.S3{}
-		if err := decodeToStruct(connection[connectionType], s3); err != nil {
-			return nil, err
-		}
 		return &connectors.DataStore{
 			Type: connectors.DataStore_S3,
 			Name: asset.Name,
 			S3: &connectors.S3DataStore{
-				Endpoint:  s3.Endpoint,
-				Bucket:    s3.Bucket,
-				ObjectKey: s3.ObjectKey,
-				Region:    emptyIfNil(s3.Region),
+				Endpoint:  connection.S3.Endpoint,
+				Bucket:    connection.S3.Bucket,
+				ObjectKey: connection.S3.ObjectKey,
+				Region:    emptyIfNil(connection.S3.Region),
 			},
 		}, nil
 	case "kafka":
-		kafka := &taxonomy.Kafka{}
-		if err := decodeToStruct(connection[connectionType], kafka); err != nil {
-			return nil, err
-		}
 		return &connectors.DataStore{
 			Type: connectors.DataStore_KAFKA,
 			Name: asset.Name,
 			Kafka: &connectors.KafkaDataStore{
-				TopicName:             emptyIfNil(kafka.TopicName),
-				BootstrapServers:      emptyIfNil(kafka.BootstrapServers),
-				SchemaRegistry:        emptyIfNil(kafka.SchemaRegistry),
-				KeyDeserializer:       emptyIfNil(kafka.KeyDeserializer),
-				ValueDeserializer:     emptyIfNil(kafka.ValueDeserializer),
-				SecurityProtocol:      emptyIfNil(kafka.SecurityProtocol),
-				SaslMechanism:         emptyIfNil(kafka.SaslMechanism),
-				SslTruststore:         emptyIfNil(kafka.SslTruststore),
-				SslTruststorePassword: emptyIfNil(kafka.SslTruststorePassword),
+				TopicName:             emptyIfNil(connection.Kafka.TopicName),
+				BootstrapServers:      emptyIfNil(connection.Kafka.BootstrapServers),
+				SchemaRegistry:        emptyIfNil(connection.Kafka.SchemaRegistry),
+				KeyDeserializer:       emptyIfNil(connection.Kafka.KeyDeserializer),
+				ValueDeserializer:     emptyIfNil(connection.Kafka.ValueDeserializer),
+				SecurityProtocol:      emptyIfNil(connection.Kafka.SecurityProtocol),
+				SaslMechanism:         emptyIfNil(connection.Kafka.SaslMechanism),
+				SslTruststore:         emptyIfNil(connection.Kafka.SslTruststore),
+				SslTruststorePassword: emptyIfNil(connection.Kafka.SslTruststorePassword),
 			},
 		}, nil
 	case "db2":
-		db2 := &taxonomy.DB2{}
-		if err := decodeToStruct(connection[connectionType], db2); err != nil {
-			return nil, err
-		}
 		return &connectors.DataStore{
 			Type: connectors.DataStore_DB2,
 			Name: asset.Name,
 			Db2: &connectors.Db2DataStore{
-				Url:      emptyIfNil(db2.Url),
-				Database: emptyIfNil(db2.Database),
-				Table:    emptyIfNil(db2.Table),
-				Port:     emptyIfNil(db2.Port),
-				Ssl:      emptyIfNil(db2.Ssl),
+				Url:      emptyIfNil(connection.Db2.Url),
+				Database: emptyIfNil(connection.Db2.Database),
+				Table:    emptyIfNil(connection.Db2.Table),
+				Port:     emptyIfNil(connection.Db2.Port),
+				Ssl:      emptyIfNil(connection.Db2.Ssl),
 			},
 		}, nil
 	default:

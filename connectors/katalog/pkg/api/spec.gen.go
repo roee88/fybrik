@@ -76,6 +76,8 @@ type ComponentMetadata_NamedMetadata struct {
 
 // Credentials defines model for Credentials.
 type Credentials struct {
+
+	// Authentication method
 	Spec externalRef0.Authentication `json:"spec"`
 }
 
