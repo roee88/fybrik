@@ -1,0 +1,20 @@
+---
+# ClusterRole katalog-editor allows users to manage assets.
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: katalog-editor
+rules:
+- apiGroups: ["katalog.m4d.ibm.com"]
+  resources: ["assets"]
+  verbs: ["get", "list", "watch", "create", "update", "patch", "delete", "deletecollection"]
+---
+# ClusterRole katalog-viewer allows viewing assets.
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1
+metadata:
+  name: katalog-viewer
+rules:
+- apiGroups: ["katalog.m4d.ibm.com"]
+  resources: ["assets"]
+  verbs: ["get", "list", "watch"]

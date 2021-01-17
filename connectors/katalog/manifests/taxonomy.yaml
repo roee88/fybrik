@@ -1,0 +1,78 @@
+openapi: 3.0.1
+info:
+  title: Taxonomy
+  version: v0.0.1
+components:
+  schemas:
+    Authentication:
+      type: object
+      properties:
+        apiKey:
+          description: API key used in various IAM enabled services
+          type: string
+        accessKey:
+          description: The access key is also known as AccessKeyId
+          type: string
+        secretKey:
+          description: The secret key is also known as SecretAccessKey
+          type: string
+        username:
+          type: string
+        password:
+          type: string
+    Connection:
+      description: Connection information
+      oneOf:
+        - $ref: '#/components/schemas/S3'
+        - $ref: '#/components/schemas/DB2'
+        - $ref: '#/components/schemas/Kafka'
+    S3:
+      description: Connection information for S3 compatible object store
+      properties:
+        bucket:
+          type: string
+        endpoint:
+          type: string
+        object_key:
+          type: string
+        region:
+          type: string
+      type: object
+      required:
+      - bucket
+      - endpoint
+      - object_key
+    DB2:
+      properties:
+        database:
+          type: string
+        port:
+          type: string
+        ssl:
+          type: string
+        table:
+          type: string
+        url:
+          type: string
+      type: object
+    Kafka:
+      properties:
+        bootstrap_servers:
+          type: string
+        key_deserializer:
+          type: string
+        sasl_mechanism:
+          type: string
+        schema_registry:
+          type: string
+        security_protocol:
+          type: string
+        ssl_truststore:
+          type: string
+        ssl_truststore_password:
+          type: string
+        topic_name:
+          type: string
+        value_deserializer:
+          type: string
+      type: object
