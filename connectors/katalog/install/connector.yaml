@@ -1,10 +1,11 @@
 # Copyright 2021 IBM Corp.
 # SPDX-License-Identifier: Apache-2.0
-
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: katalog-connector
+  namespace: m4d-system
   labels:
     app: katalog-connector
 spec:
@@ -20,6 +21,7 @@ spec:
         app: katalog-connector
         m4d.ibm.com/componentType: connector
     spec:
+      serviceAccountName: katalog-connector
       containers:
       - name: katalog-connector
         image: katalog-connector:latest

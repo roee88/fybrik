@@ -2,6 +2,6 @@
 # SPDX-License-Identifier: Apache-2.0
 
 resources:
-- connector.yaml
 - crds.gen.yaml
 - rbac.yaml
+- connector.yaml

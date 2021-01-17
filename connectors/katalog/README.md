@@ -8,7 +8,7 @@ A data catalog and credentials manager powered by Kubernetes resources:
 
 An [`Asset`](docs/README.md#asset) CRD includes a reference to a credentials `Secret`, connection information, and other metadata such as columns and associated security tags. Apply it like any other Kubernetes resource. 
 
-Access credenditals are stored in Kubernetes `Secret` resources that should be applied next to `Asset` resources that reference them. You can use [Basic authentication Secret](https://kubernetes.io/docs/concepts/configuration/secret/#basic-authentication-secret) or [Opaque secrets](https://kubernetes.io/docs/concepts/configuration/secret/#opaque-secrets) with the following keys: 
+Access credenditals are stored in Kubernetes `Secret` resources. You can use [Basic authentication secrets](https://kubernetes.io/docs/concepts/configuration/secret/#basic-authentication-secret) or [Opaque secrets](https://kubernetes.io/docs/concepts/configuration/secret/#opaque-secrets) with the following keys:
 <table>
     <thead>
         <tr>
