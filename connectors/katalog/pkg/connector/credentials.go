@@ -4,14 +4,13 @@ package connector
 
 import (
 	"context"
-	"encoding/base64"
-	"encoding/json"
-
-	"github.com/pkg/errors"
+	"fmt"
 
 	corev1 "k8s.io/api/core/v1"
 
+	"github.com/ibm/the-mesh-for-data/connectors/katalog/pkg/taxonomy"
 	connectors "github.com/ibm/the-mesh-for-data/pkg/connectors/protobuf"
+	"github.com/pkg/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	kclient "sigs.k8s.io/controller-runtime/pkg/client"
 )
@@ -42,27 +41,38 @@ func (s *DataCredentialsService) GetCredentialsInfo(ctx context.Context, req *co
 		return nil, err
 	}
 
-	// Decode the secret data
-	data, err := base64.StdEncoding.DecodeString(string(secret.Data["main"]))
-	if err != nil {
-		return nil, errors.Wrap(err, "Failed to decode secret")
+	// Get the data fields as strings
+	data := map[string]string{}
+	for key, value := range secret.Data {
+		data[key] = string(value)
 	}
 
-	// Load the secret data as a Credentials object
-	credentials := &Credentials{}
-	err = json.Unmarshal(data, &credentials)
-	if err != nil {
-		return nil, errors.Wrap(err, "Failed to parse credentials from secret")
+	// Decode into Authentication structure
+	authn := &taxonomy.Authentication{}
+	switch secret.Type {
+	case corev1.SecretTypeOpaque:
+		err = decodeToStruct(data, authn)
+		if err != nil {
+			return nil, errors.Wrap(err, "Invalid fields in Secret data")
+		}
+	case corev1.SecretTypeBasicAuth:
+		username := data[corev1.BasicAuthUsernameKey]
+		password := data[corev1.BasicAuthPasswordKey]
+		authn.Username = &username
+		authn.Password = &password
+	default:
+		// TODO(roee88): add SSHAuth and TLSAuth as in corev1.SecretType
+		return nil, fmt.Errorf("unknown secret type %s", secret.Type)
 	}
 
+	// Map to current connectors API
 	return &connectors.DatasetCredentials{
 		DatasetId: req.DatasetId,
 		Creds: &connectors.Credentials{
-			AccessKey: emptyIfNil(credentials.Spec.ApiKey),
-			SecretKey: emptyIfNil(credentials.Spec.SecretKey),
-			Username:  emptyIfNil(credentials.Spec.Username),
-			Password:  emptyIfNil(credentials.Spec.Password),
-			ApiKey:    emptyIfNil(credentials.Spec.ApiKey),
-		},
-	}, nil
+			AccessKey: emptyIfNil(authn.AccessKey),
+			SecretKey: emptyIfNil(authn.SecretKey),
+			ApiKey:    emptyIfNil(authn.ApiKey),
+			Username:  emptyIfNil(authn.Username),
+			Password:  emptyIfNil(authn.Password),
+		}}, nil
 }

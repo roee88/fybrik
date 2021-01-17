@@ -15,12 +15,6 @@ type Asset struct {
 	api.Asset         `json:",inline"`
 }
 
-type Credentials struct {
-	metav1.TypeMeta   `json:",inline"`
-	metav1.ObjectMeta `json:"metadata,omitempty"`
-	api.Credentials   `json:",inline"`
-}
-
 var (
 	// GroupVersion is group version used to register these objects
 	GroupVersion = schema.GroupVersion{Group: "katalog.m4d.ibm.com", Version: "v1alpha1"}

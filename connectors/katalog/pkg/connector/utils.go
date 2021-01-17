@@ -3,6 +3,7 @@
 package connector
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -23,11 +24,15 @@ func emptyArrayIfNil(val *[]string) []string {
 }
 
 func decodeToStruct(m interface{}, s interface{}) error {
-	bytes, err := json.Marshal(m)
+	data, err := json.Marshal(m)
 	if err != nil {
 		return err
 	}
-	err = json.Unmarshal(bytes, s)
+
+	dec := json.NewDecoder(bytes.NewReader(data))
+	dec.DisallowUnknownFields()
+
+	err = dec.Decode(s)
 	if err != nil {
 		return err
 	}

@@ -4,7 +4,7 @@ include $(ROOT_DIR)/hack/make-rules/docker.mk
 include $(ROOT_DIR)/hack/make-rules/tools.mk
 DOCKER_NAME=katalog-connector
 
-all: build docker-build install
+all: build docker-build docker-push deploy
 
 .PHONY: generate
 generate: $(TOOLBIN)/oapi-codegen $(TOOLBIN)/crdoc $(TOOLBIN)/openapi2crd

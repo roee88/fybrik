@@ -10,8 +10,6 @@ Resource Types:
 
 - [Asset](#asset)
 
-- [Credentials](#credentials)
-
 
 
 
@@ -415,95 +413,6 @@ Reference to a Secret resource holding credentials for this asset
         <td><b>tags</b></td>
         <td>[]string</td>
         <td>Tags - can be any free text added to a component (no taxonomy)</td>
-        <td>false</td>
-      </tr></tbody>
-</table>
-
-## Credentials
-<sup><sup>[↩ Parent](#katalog.m4d.ibm.com/v1alpha1 )</sup></sup>
-
-
-
-
-
-
-
-
-<table>
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Description</th>
-            <th>Required</th>
-        </tr>
-    </thead>
-    <tbody><tr>
-      <td><b>apiVersion</b></td>
-      <td>string</td>
-      <td>katalog.m4d.ibm.com/v1alpha1</td>
-      <td>true</td>
-      </tr>
-      <tr>
-      <td><b>kind</b></td>
-      <td>string</td>
-      <td>Credentials</td>
-      <td>true</td>
-      </tr>
-      <tr>
-      <td><b><a href="https://kubernetes.io/docs/reference/generated/kubernetes-api/v1.20/#objectmeta-v1-meta">metadata</a></b></td>
-      <td>object</td>
-      <td>Refer to the Kubernetes API documentation for the fields of the `metadata` field.</td>
-      <td>true</td>
-      </tr><tr>
-        <td><b><a href="#credentialsspec">spec</a></b></td>
-        <td>object</td>
-        <td>Authentication parameters</td>
-        <td>true</td>
-      </tr></tbody>
-</table>
-
-
-### Credentials.spec
-<sup><sup>[↩ Parent](#credentials)</sup></sup>
-
-
-
-Authentication parameters
-
-<table>
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Type</th>
-            <th>Description</th>
-            <th>Required</th>
-        </tr>
-    </thead>
-    <tbody><tr>
-        <td><b>accessKey</b></td>
-        <td>string</td>
-        <td>Access key also known as AccessKeyId</td>
-        <td>false</td>
-      </tr><tr>
-        <td><b>apiKey</b></td>
-        <td>string</td>
-        <td>API key used in various IAM enabled services</td>
-        <td>false</td>
-      </tr><tr>
-        <td><b>password</b></td>
-        <td>string</td>
-        <td>Password for basic authentication</td>
-        <td>false</td>
-      </tr><tr>
-        <td><b>secretKey</b></td>
-        <td>string</td>
-        <td>Secret key also known as SecretAccessKey</td>
-        <td>false</td>
-      </tr><tr>
-        <td><b>username</b></td>
-        <td>string</td>
-        <td>Username for basic authentication</td>
         <td>false</td>
       </tr></tbody>
 </table>

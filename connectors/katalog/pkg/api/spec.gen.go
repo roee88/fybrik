@@ -74,13 +74,6 @@ type ComponentMetadata_NamedMetadata struct {
 	AdditionalProperties map[string]string `json:"-"`
 }
 
-// Credentials defines model for Credentials.
-type Credentials struct {
-
-	// Authentication parameters
-	Spec externalRef0.Authentication `json:"spec"`
-}
-
 // SecretRef defines model for SecretRef.
 type SecretRef struct {
 

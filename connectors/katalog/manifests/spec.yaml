@@ -3,13 +3,6 @@
 openapi: 3.0.1
 components:
   schemas:
-    Credentials:
-      type: object
-      properties:
-        spec:
-          $ref: 'taxonomy.yaml#/components/schemas/Authentication'
-      required:
-      - spec
     Asset:
       type: object
       properties:
