@@ -53,20 +53,14 @@ func (s *DataCredentialsService) GetCredentialsInfo(ctx context.Context, req *co
 		return nil, errors.Wrap(err, "Failed to parse credentials from secret")
 	}
 
-	creds := &connectors.Credentials{}
-
-	switch credentials.Spec.Type {
-	case "basic":
-		creds.Username = credentials.Spec.Basic.Username
-		creds.Password = credentials.Spec.Basic.Password
-	case "accessKeys":
-		creds.AccessKey = credentials.Spec.AccessKeys.AccessKey
-		creds.SecretKey = credentials.Spec.AccessKeys.SecretKey
-	case "apiKey":
-		creds.ApiKey = *credentials.Spec.ApiKey
-	default:
-		return nil, errors.New("unknown credentials type")
-	}
-
-	return &connectors.DatasetCredentials{DatasetId: req.DatasetId, Creds: creds}, nil
+	return &connectors.DatasetCredentials{
+		DatasetId: req.DatasetId,
+		Creds: &connectors.Credentials{
+			AccessKey: emptyIfNil(credentials.Spec.ApiKey),
+			SecretKey: emptyIfNil(credentials.Spec.SecretKey),
+			Username:  emptyIfNil(credentials.Spec.Username),
+			Password:  emptyIfNil(credentials.Spec.Password),
+			ApiKey:    emptyIfNil(credentials.Spec.ApiKey),
+		},
+	}, nil
 }

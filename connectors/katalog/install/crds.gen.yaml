@@ -167,43 +167,23 @@ spec:
       openAPIV3Schema:
         properties:
           spec:
-            description: Authentication method
+            description: Authentication parameters
             properties:
-              accessKeys:
-                description: Authentication using access key and secret key
-                properties:
-                  accessKey:
-                    description: The access key is also known as AccessKeyId
-                    type: string
-                  secretKey:
-                    description: The secret key is also known as SecretAccessKey
-                    type: string
-                required:
-                - accessKey
-                - secretKey
-                type: object
+              accessKey:
+                description: Access key also known as AccessKeyId
+                type: string
               apiKey:
                 description: API key used in various IAM enabled services
                 type: string
-              basic:
-                description: Authentication using username and password
-                properties:
-                  password:
-                    type: string
-                  username:
-                    type: string
-                required:
-                - username
-                - password
-                type: object
-              type:
-                enum:
-                - basic
-                - accessKeys
-                - apiKey
+              password:
+                description: Password for basic authentication
                 type: string
-            required:
-            - type
+              secretKey:
+                description: Secret key also known as SecretAccessKey
+                type: string
+              username:
+                description: Username for basic authentication
+                type: string
             type: object
         required:
         - spec
