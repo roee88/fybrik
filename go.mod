@@ -11,6 +11,7 @@ require (
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/go-chi/render v1.0.1
 	github.com/go-logr/logr v0.3.0
+	github.com/go-logr/zapr v0.3.0 // indirect
 	github.com/gogo/protobuf v1.3.1
 	github.com/golang/protobuf v1.4.3
 	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79 // indirect
@@ -41,9 +42,5 @@ require (
 )
 
 replace helm.sh/helm/v3 v3.5.0 => github.com/hunchback/helm/v3 v3.5.0-hunchback
-
-replace github.com/golang/protobuf => github.com/golang/protobuf v1.3.5
-
-replace github.com/onsi/gomega => github.com/onsi/gomega v1.10.0
 
 replace github.com/google/addlicense => github.com/the-mesh-for-data/addlicense v0.0.0-20200913135744-636c44b42906
