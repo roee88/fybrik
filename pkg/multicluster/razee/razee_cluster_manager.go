@@ -3,7 +3,11 @@ package razee
 import (
 	"errors"
 	"fmt"
-	"github.com/IBM/go-sdk-core/core"
+	"net/http"
+	"strconv"
+	"strings"
+
+	"github.com/IBM/go-sdk-core/v4/core"
 	"github.com/IBM/satcon-client-go/client"
 	"github.com/ghodss/yaml"
 	"github.com/go-logr/logr"
@@ -12,10 +16,7 @@ import (
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	"net/http"
 	ctrl "sigs.k8s.io/controller-runtime"
-	"strconv"
-	"strings"
 )
 
 const (

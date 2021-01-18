@@ -1,4 +1,4 @@
-SKIP_INSTALL_CHECK ?= true
+SKIP_INSTALL_CHECK ?= false
 
 define post-install-check
 	$(SKIP_INSTALL_CHECK) || go mod tidy
