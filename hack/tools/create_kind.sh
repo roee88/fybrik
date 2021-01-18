@@ -35,12 +35,12 @@ certs_create() {
 
     if [ ! -f ../registry/themeshfordata-ca.crt ]; then
       openssl genrsa -out ../registry/themeshfordata-ca.key 2048
-      openssl req -new -x509 -key ../registry/themeshfordata-ca.key -out ../registry/themeshfordata-ca.crt -subj '/C=US/ST=NY/O=IBM/CN=themeshfordata' -extensions EXT -config <(printf "[dn]\nCN=ibm\n[req]\ndistinguished_name = dn\n[EXT]\nsubjectAltName=DNS:ibm\nbasicConstraints=CA:TRUE,pathlen:0")
+      openssl req -x509 -nodes -key ../registry/themeshfordata-ca.key -out ../registry/themeshfordata-ca.crt -subj '/CN=kind-registry' -addext "subjectAltName=DNS:kind-registry,DNS:localhost"
     fi
+    # TODO: revert to what darwin needs but keep ubuntu working
     if [ ! -f ../registry/registry.crt ]; then
-      openssl genrsa -out ../registry/registry.key 2048
-      openssl req -new -key ../registry/registry.key -out ../registry/registry.csr -subj '/C=US/ST=NY/O=IBM/CN=kind-registry' -extensions EXT -config <(printf "[dn]\nCN=kind-registry\n[req]\ndistinguished_name = dn\n[EXT]\nsubjectAltName=DNS:kind-registry,DNS:localhost\nkeyUsage=digitalSignature\nextendedKeyUsage=serverAuth")
-      openssl x509 -req -in ../registry/registry.csr -CA ../registry/themeshfordata-ca.crt -CAkey ../registry/themeshfordata-ca.key -CAcreateserial -out ../registry/registry.crt
+      cp ../registry/themeshfordata-ca.key ../registry/registry.key
+      cp ../registry/themeshfordata-ca.crt ../registry/registry.crt
     fi
 }
 
