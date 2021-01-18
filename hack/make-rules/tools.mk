@@ -116,13 +116,11 @@ $(TOOLBIN)/oapi-codegen:
 
 INSTALL_TOOLS += $(TOOLBIN)/openapi2crd
 $(TOOLBIN)/openapi2crd:
-	GOBIN=$(ABSTOOLBIN) GO111MODULE=on go get github.com/mesh-for-data/openapi2crd
-	$(call post-install-check)
+	curl -sfL https://raw.githubusercontent.com/mesh-for-data/openapi2crd/main/hack/get-openapi2crd.sh | sh -s -- -b $(ABSTOOLBIN)
 
 INSTALL_TOOLS += $(TOOLBIN)/crdoc
 $(TOOLBIN)/crdoc:
-	GOBIN=$(ABSTOOLBIN) GO111MODULE=on go get github.com/mesh-for-data/crdoc
-	$(call post-install-check)
+	curl -sfL https://raw.githubusercontent.com/mesh-for-data/crdoc/main/hack/get-crdoc.sh | sh -s -- -b $(ABSTOOLBIN)
 
 .PHONY: install-tools
 install-tools: $(INSTALL_TOOLS)
