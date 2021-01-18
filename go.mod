@@ -3,6 +3,7 @@ module github.com/ibm/the-mesh-for-data
 go 1.13
 
 require (
+	cloud.google.com/go v0.66.0 // indirect
 	emperror.dev/errors v0.8.0
 	github.com/IBM/go-sdk-core/v4 v4.10.0
 	github.com/IBM/satcon-client-go v0.0.0-20210107134702-1be071817792
@@ -21,7 +22,7 @@ require (
 	github.com/pkg/errors v0.9.1
 	github.com/robfig/cron v1.2.0
 	github.com/stretchr/testify v1.6.1
-	google.golang.org/grpc v1.28.1
+	google.golang.org/grpc v1.31.1
 	gopkg.in/yaml.v2 v2.3.0
 	helm.sh/helm/v3 v3.5.0
 	istio.io/client-go v1.8.2
