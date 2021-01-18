@@ -28,7 +28,6 @@ require (
 	google.golang.org/grpc v1.31.1
 	gopkg.in/yaml.v2 v2.3.0
 	helm.sh/helm/v3 v3.5.0
-	honnef.co/go/tools v0.0.1-2020.1.5 // indirect
 	istio.io/client-go v1.8.2
 	istio.io/gogo-genproto v0.0.0-20191009201739-17d570f95998 // indirect
 	k8s.io/api v0.20.2
@@ -37,7 +36,7 @@ require (
 	k8s.io/client-go v0.20.2
 	rsc.io/letsencrypt v0.0.3 // indirect
 	sigs.k8s.io/cli-utils v0.22.4
-	sigs.k8s.io/controller-runtime v0.8.0
+	sigs.k8s.io/controller-runtime v0.6.2
 	sigs.k8s.io/yaml v1.2.0
 )
 
