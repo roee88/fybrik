@@ -36,7 +36,7 @@ require (
 	sigs.k8s.io/yaml v1.2.0
 )
 
-// replace helm.sh/helm/v3 v3.5.0 => github.com/hunchback/helm/v3 v3.5.0-hunchback
+replace helm.sh/helm/v3 v3.5.0 => github.com/hunchback/helm/v3 v3.5.0-hunchback
 
 replace github.com/golang/protobuf => github.com/golang/protobuf v1.3.5
 
