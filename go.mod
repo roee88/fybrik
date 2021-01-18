@@ -15,16 +15,20 @@ require (
 	github.com/golang/protobuf v1.4.3
 	github.com/gregjones/httpcache v0.0.0-20190611155906-901d90724c79 // indirect
 	github.com/hashicorp/vault/api v1.0.4
+	github.com/jmoiron/sqlx v1.2.1-0.20190826204134-d7d95172beb5 // indirect
 	github.com/machinebox/graphql v0.2.2
 	github.com/matryer/is v1.4.0 // indirect
+	github.com/mattn/go-colorable v0.1.7 // indirect
 	github.com/onsi/ginkgo v1.14.2
 	github.com/onsi/gomega v1.10.3
 	github.com/pkg/errors v0.9.1
 	github.com/robfig/cron v1.2.0
+	github.com/rogpeppe/go-internal v1.6.0 // indirect
 	github.com/stretchr/testify v1.6.1
 	google.golang.org/grpc v1.31.1
 	gopkg.in/yaml.v2 v2.3.0
 	helm.sh/helm/v3 v3.5.0
+	honnef.co/go/tools v0.0.1-2020.1.5 // indirect
 	istio.io/client-go v1.8.2
 	istio.io/gogo-genproto v0.0.0-20191009201739-17d570f95998 // indirect
 	k8s.io/api v0.20.2
