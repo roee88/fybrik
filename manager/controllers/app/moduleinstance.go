@@ -8,10 +8,11 @@ import (
 	"github.com/go-logr/logr"
 	app "github.com/ibm/the-mesh-for-data/manager/apis/app/v1alpha1"
 	modules "github.com/ibm/the-mesh-for-data/manager/controllers/app/modules"
+	"github.com/ibm/the-mesh-for-data/manager/controllers/app/types"
 	"github.com/ibm/the-mesh-for-data/manager/controllers/utils"
 	pb "github.com/ibm/the-mesh-for-data/pkg/connectors/protobuf"
 	"github.com/ibm/the-mesh-for-data/pkg/multicluster"
-	"k8s.io/apimachinery/pkg/types"
+	ktypes "k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
 
@@ -21,7 +22,7 @@ type ModuleManager struct {
 	Log      logr.Logger
 	Modules  map[string]*app.M4DModule
 	Clusters []multicluster.Cluster
-	Owner    types.NamespacedName
+	Owner    ktypes.NamespacedName
 }
 
 // SelectModuleInstances builds a list of required modules with the relevant arguments
@@ -53,14 +54,14 @@ func StructToInterfaceDetails(item modules.DataInfo) (*app.InterfaceDetails, err
 // These buckets are allocated during deployment of the control plane.
 // If there are no free buckets the creation of the runtime environment for the application will fail.
 // TODO - In the future need to implement dynamic provisioning of buckets for implicit copy.
-func (m *ModuleManager) GetCopyDestination(item modules.DataInfo, destinationInterface *app.InterfaceDetails) (*app.DataStore, error) {
+func (m *ModuleManager) GetCopyDestination(item modules.DataInfo, destinationInterface *app.InterfaceDetails) (*types.DataStore, error) {
 	// provisioned storage for COPY
 	originalAssetName := item.DataDetails.Name
 	bucket := FindAvailableBucket(m.Client, m.Log, m.Owner, item.AssetID, originalAssetName, false)
 	if bucket == nil {
 		return nil, errors.New(app.InsufficientStorage)
 	}
-	return &app.DataStore{
+	return &types.DataStore{
 		CredentialLocation: utils.GetFullCredentialsPath(bucket.Spec.VaultPath),
 		Connection: &pb.DataStore{
 			Type: pb.DataStore_S3,
@@ -95,8 +96,8 @@ func (m *ModuleManager) SelectModuleInstances(item modules.DataInfo) ([]modules.
 		return instances, err
 	}
 	sink := item.AppInterface
-	var sourceDataStore, sinkDataStore *app.DataStore
-	sourceDataStore = &app.DataStore{
+	var sourceDataStore, sinkDataStore *types.DataStore
+	sourceDataStore = &types.DataStore{
 		Connection:         item.DataDetails.GetDataStore(),
 		CredentialLocation: utils.GetDatasetVaultPath(item.AssetID),
 		Format:             item.DataDetails.DataFormat,
@@ -108,7 +109,7 @@ func (m *ModuleManager) SelectModuleInstances(item modules.DataInfo) ([]modules.
 	// actions are not checked since they are not necessarily done by the read module
 	readSelector = &modules.Selector{Flow: app.Read,
 		Destination:  sink,
-		Actions:      make([]pb.EnforcementAction, 0),
+		Actions:      make([]*pb.EnforcementAction, 0),
 		Source:       nil,
 		Dependencies: make([]*app.M4DModule, 0),
 		Module:       nil,
@@ -152,8 +153,8 @@ func (m *ModuleManager) SelectModuleInstances(item modules.DataInfo) ([]modules.
 			return instances, nil
 		}
 		// append moduleinstances to the list
-		copyArgs := &app.ModuleArguments{
-			Copy: &app.CopyModuleArgs{
+		copyArgs := &types.ModuleArguments{
+			Copy: &types.CopyModuleArgs{
 				Source:          *sourceDataStore,
 				Destination:     *sinkDataStore,
 				Transformations: copySelector.Actions},
@@ -166,19 +167,19 @@ func (m *ModuleManager) SelectModuleInstances(item modules.DataInfo) ([]modules.
 		instances = copySelector.AddModuleInstances(copyArgs, item, copyCluster)
 	}
 	m.Log.Info("Adding read path")
-	var readSource app.DataStore
+	var readSource types.DataStore
 	if sinkDataStore == nil {
 		readSource = *sourceDataStore
 	} else {
 		readSource = *sinkDataStore
 	}
 
-	readInstructions := make([]app.ReadModuleArgs, 0)
-	readInstructions = append(readInstructions, app.ReadModuleArgs{
+	readInstructions := make([]types.ReadModuleArgs, 0)
+	readInstructions = append(readInstructions, types.ReadModuleArgs{
 		Source:          readSource,
 		AssetID:         utils.CreateDataSetIdentifier(item.AssetID),
 		Transformations: readSelector.Actions})
-	readArgs := &app.ModuleArguments{
+	readArgs := &types.ModuleArguments{
 		Read: readInstructions,
 	}
 	readCluster, err := readSelector.SelectCluster(item, m.Clusters)
@@ -211,7 +212,7 @@ func GetSupportedReadSources(module *app.M4DModule) []*app.InterfaceDetails {
 // - true if copy is required, false - otherwise
 // - interface capabilities to match copy destination, based on read sources
 // - actions that copy has to support
-func (m *ModuleManager) getCopyRequirements(item modules.DataInfo, readSelector *modules.Selector) (bool, []*app.InterfaceDetails, []pb.EnforcementAction) {
+func (m *ModuleManager) getCopyRequirements(item modules.DataInfo, readSelector *modules.Selector) (bool, []*app.InterfaceDetails, []*pb.EnforcementAction) {
 	m.Log.Info("Checking supported read sources")
 	sources := GetSupportedReadSources(readSelector.GetModule())
 	utils.PrintStructure(sources, m.Log, "Read sources")

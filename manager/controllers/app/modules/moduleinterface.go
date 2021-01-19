@@ -7,6 +7,7 @@ import (
 	"errors"
 
 	app "github.com/ibm/the-mesh-for-data/manager/apis/app/v1alpha1"
+	"github.com/ibm/the-mesh-for-data/manager/controllers/app/types"
 	"github.com/ibm/the-mesh-for-data/manager/controllers/utils"
 	pb "github.com/ibm/the-mesh-for-data/pkg/connectors/protobuf"
 	"github.com/ibm/the-mesh-for-data/pkg/multicluster"
@@ -15,7 +16,7 @@ import (
 // Transformations structure defines the governance actions to be taken for a specific flow
 type Transformations struct {
 	Allowed            bool
-	EnforcementActions []pb.EnforcementAction
+	EnforcementActions []*pb.EnforcementAction
 	Message            string
 }
 
@@ -38,7 +39,7 @@ type DataInfo struct {
 // ModuleInstanceSpec consists of the module spec and arguments
 type ModuleInstanceSpec struct {
 	Module      *app.M4DModule
-	Args        *app.ModuleArguments
+	Args        *types.ModuleArguments
 	AssetID     string
 	ClusterName string
 }
@@ -51,7 +52,7 @@ type Selector struct {
 	Flow         app.ModuleFlow
 	Source       *app.InterfaceDetails
 	Destination  *app.InterfaceDetails
-	Actions      []pb.EnforcementAction
+	Actions      []*pb.EnforcementAction
 }
 
 // GetModule returns the selected module
@@ -70,7 +71,7 @@ func (m *Selector) GetError() string {
 }
 
 // AddModuleInstances creates module instances for the selected module and its dependencies
-func (m *Selector) AddModuleInstances(args *app.ModuleArguments, item DataInfo, cluster string) []ModuleInstanceSpec {
+func (m *Selector) AddModuleInstances(args *types.ModuleArguments, item DataInfo, cluster string) []ModuleInstanceSpec {
 	instances := make([]ModuleInstanceSpec, 0)
 	// append moduleinstances to the list
 	instances = append(instances, ModuleInstanceSpec{
@@ -91,10 +92,9 @@ func (m *Selector) AddModuleInstances(args *app.ModuleArguments, item DataInfo, 
 }
 
 // SupportsGovernanceActions checks whether the module supports the required agovernance actions
-func (m *Selector) SupportsGovernanceActions(module *app.M4DModule, actions []pb.EnforcementAction) bool {
+func (m *Selector) SupportsGovernanceActions(module *app.M4DModule, actions []*pb.EnforcementAction) bool {
 	// Check that the governance actions match
-	for i := range actions {
-		action := &actions[i]
+	for _, action := range actions {
 		supportsAction := false
 		for j := range module.Spec.Capabilities.Actions {
 			transformation := &module.Spec.Capabilities.Actions[j]
@@ -111,7 +111,7 @@ func (m *Selector) SupportsGovernanceActions(module *app.M4DModule, actions []pb
 }
 
 // SupportsGovernanceAction checks whether the module supports the required agovernance action
-func (m *Selector) SupportsGovernanceAction(module *app.M4DModule, action pb.EnforcementAction) bool {
+func (m *Selector) SupportsGovernanceAction(module *app.M4DModule, action *pb.EnforcementAction) bool {
 	// Check that the governance actions match
 	for j := range module.Spec.Capabilities.Actions {
 		transformation := &module.Spec.Capabilities.Actions[j]

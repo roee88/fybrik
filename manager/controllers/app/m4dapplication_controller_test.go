@@ -13,25 +13,26 @@ import (
 	"sigs.k8s.io/yaml"
 
 	apiv1alpha1 "github.com/ibm/the-mesh-for-data/manager/apis/app/v1alpha1"
+	"github.com/ibm/the-mesh-for-data/manager/controllers/app/types"
 	pb "github.com/ibm/the-mesh-for-data/pkg/connectors/protobuf"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/types"
+	ktypes "k8s.io/apimachinery/pkg/ktypes"
 )
 
 const timeout = time.Second * 30
 const interval = time.Millisecond * 100
 
 // GetStorageSignature returns a signature of M4DBucket
-func GetStorageSignature() types.NamespacedName {
-	return types.NamespacedName{Name: "available-bucket", Namespace: "default"}
+func GetStorageSignature() ktypes.NamespacedName {
+	return ktypes.NamespacedName{Name: "available-bucket", Namespace: "default"}
 }
 
 // InitM4DApplication creates an empty resource with n data sets
 func InitM4DApplication(name string, n int) *apiv1alpha1.M4DApplication {
-	appSignature := types.NamespacedName{Name: name, Namespace: "default"}
+	appSignature := ktypes.NamespacedName{Name: name, Namespace: "default"}
 	return &apiv1alpha1.M4DApplication{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      appSignature.Name,
@@ -43,7 +44,7 @@ func InitM4DApplication(name string, n int) *apiv1alpha1.M4DApplication {
 
 func DeleteM4DApplication(name string) {
 	// delete application
-	appSignature := types.NamespacedName{Name: name, Namespace: "default"}
+	appSignature := ktypes.NamespacedName{Name: name, Namespace: "default"}
 	resource := &apiv1alpha1.M4DApplication{ObjectMeta: metav1.ObjectMeta{Name: appSignature.Name, Namespace: appSignature.Namespace}}
 	_ = k8sClient.Delete(context.Background(), resource)
 
@@ -123,16 +124,22 @@ func CreateDb2ToS3CopyModule() *apiv1alpha1.M4DModule {
 						Flow:   apiv1alpha1.Copy,
 					},
 				},
-				Actions: make([]pb.EnforcementAction, 2),
+				Actions: []apiv1alpha1.SupportedAction{
+					{
+						Id:    "redact-ID",
+						Level: pb.EnforcementAction_COLUMN,
+					},
+					{
+						Id:    "encrypt-ID",
+						Level: pb.EnforcementAction_COLUMN,
+					},
+				},
 			},
 			Chart: apiv1alpha1.ChartSpec{
 				Name: "db2-chart",
 			},
 		},
 	}
-	// define actions
-	db2Module.Spec.Capabilities.Actions[0] = pb.EnforcementAction{Name: "redact", Id: "redact-ID", Level: pb.EnforcementAction_COLUMN}
-	db2Module.Spec.Capabilities.Actions[1] = pb.EnforcementAction{Name: "encrypt", Id: "encrypt-ID", Level: pb.EnforcementAction_COLUMN}
 	return db2Module
 }
 
@@ -154,15 +161,22 @@ func CreateS3ToS3CopyModule() *apiv1alpha1.M4DModule {
 						Sink:   &apiv1alpha1.InterfaceDetails{Protocol: apiv1alpha1.S3, DataFormat: apiv1alpha1.Parquet},
 					},
 				},
-				Actions: make([]pb.EnforcementAction, 2),
+				Actions: []apiv1alpha1.SupportedAction{
+					{
+						Id:    "redact-ID",
+						Level: pb.EnforcementAction_COLUMN,
+					},
+					{
+						Id:    "encrypt-ID",
+						Level: pb.EnforcementAction_COLUMN,
+					},
+				},
 			},
 			Chart: apiv1alpha1.ChartSpec{
 				Name: "s3-s3",
 			},
 		},
 	}
-	s3Module.Spec.Capabilities.Actions[0] = pb.EnforcementAction{Name: "redact", Id: "redact-ID", Level: pb.EnforcementAction_COLUMN}
-	s3Module.Spec.Capabilities.Actions[1] = pb.EnforcementAction{Name: "encrypt", Id: "encrypt-ID", Level: pb.EnforcementAction_COLUMN}
 	return s3Module
 }
 
@@ -215,7 +229,7 @@ var _ = Describe("M4DApplication Controller", func() {
 			Expect(k8sClient.Create(context.Background(), copyModule)).Should(Succeed())
 			Expect(k8sClient.Create(context.Background(), readPathModule)).Should(Succeed())
 
-			appSignature := types.NamespacedName{Name: "with-finalizers", Namespace: "default"}
+			appSignature := ktypes.NamespacedName{Name: "with-finalizers", Namespace: "default"}
 			resource := InitM4DApplication(appSignature.Name, 1)
 			resource.Spec.Data[0] = apiv1alpha1.DataContext{
 				DataSetID: "{\"asset_id\": \"123\", \"catalog_id\": \"db2\"}",
@@ -260,7 +274,7 @@ var _ = Describe("M4DApplication Controller", func() {
 
 		It("Test deny-on-read", func() {
 
-			appSignature := types.NamespacedName{Name: "deny-on-read", Namespace: "default"}
+			appSignature := ktypes.NamespacedName{Name: "deny-on-read", Namespace: "default"}
 			resource := InitM4DApplication(appSignature.Name, 1)
 			resource.Spec.Data[0] = apiv1alpha1.DataContext{
 				DataSetID: "{\"asset_id\": \"deny-dataset\", \"catalog_id\": \"s3\"}",
@@ -293,7 +307,7 @@ var _ = Describe("M4DApplication Controller", func() {
 		// Result: an error
 
 		It("Test no-read-path", func() {
-			appSignature := types.NamespacedName{Name: "read-expected", Namespace: "default"}
+			appSignature := ktypes.NamespacedName{Name: "read-expected", Namespace: "default"}
 			resource := InitM4DApplication(appSignature.Name, 1)
 
 			resource.Spec.Data[0] = apiv1alpha1.DataContext{
@@ -335,7 +349,7 @@ var _ = Describe("M4DApplication Controller", func() {
 			module := CreateReadPathModule()
 			Expect(k8sClient.Create(context.Background(), module)).Should(Succeed())
 
-			appSignature := types.NamespacedName{Name: "with-copy", Namespace: "default"}
+			appSignature := ktypes.NamespacedName{Name: "with-copy", Namespace: "default"}
 			resource := InitM4DApplication(appSignature.Name, 1)
 			resource.Spec.Data[0] = apiv1alpha1.DataContext{
 				DataSetID: "{\"asset_id\": \"deny-on-copy\", \"catalog_id\": \"db2\"}",
@@ -378,7 +392,7 @@ var _ = Describe("M4DApplication Controller", func() {
 			Expect(k8sClient.Create(context.Background(), module)).Should(Succeed())
 			Expect(k8sClient.Create(context.Background(), readPathModule)).Should(Succeed())
 
-			appSignature := types.NamespacedName{Name: "wrong-copy", Namespace: "default"}
+			appSignature := ktypes.NamespacedName{Name: "wrong-copy", Namespace: "default"}
 			resource := InitM4DApplication(appSignature.Name, 2)
 			resource.Spec.Data[0] = apiv1alpha1.DataContext{
 				DataSetID: "{\"asset_id\": \"allow-dataset\", \"catalog_id\": \"db2\"}",
@@ -445,7 +459,7 @@ var _ = Describe("M4DApplication Controller", func() {
 			db2Module := CreateDb2ToS3CopyModule()
 			Expect(k8sClient.Create(context.Background(), db2Module)).Should(Succeed())
 
-			appSignature := types.NamespacedName{Name: "m4d-test", Namespace: "default"}
+			appSignature := ktypes.NamespacedName{Name: "m4d-test", Namespace: "default"}
 			resource := InitM4DApplication(appSignature.Name, 2)
 			resource.Spec.Data[0] = apiv1alpha1.DataContext{
 				DataSetID: "{\"asset_id\": \"default-dataset\", \"catalog_id\": \"db2\"}",
@@ -484,9 +498,13 @@ var _ = Describe("M4DApplication Controller", func() {
 				// There should be a single read module with two datasets
 				numReads := 0
 				for _, step := range blueprint.Spec.Flow.Steps {
+					args := &types.ModuleArguments{}
+					err := args.FromRawExtention(step.Arguments)
+					Expect(err).ToNot(HaveOccurred())
+
 					if step.Template == readPathModule.Name {
 						numReads++
-						Expect(len(step.Arguments.Read)).To(Equal(2))
+						Expect(len(args.Read)).To(Equal(2))
 					}
 				}
 				Expect(numReads).To(Equal(1))
@@ -519,7 +537,7 @@ var _ = Describe("M4DApplication Controller", func() {
 			db2Module := CreateDb2ToS3CopyModule()
 			Expect(k8sClient.Create(context.Background(), db2Module)).Should(Succeed())
 
-			appSignature := types.NamespacedName{Name: "multiple-regions", Namespace: "default"}
+			appSignature := ktypes.NamespacedName{Name: "multiple-regions", Namespace: "default"}
 			resource := InitM4DApplication(appSignature.Name, 1)
 			resource.Spec.Data[0] = apiv1alpha1.DataContext{
 				DataSetID: "{\"asset_id\": \"default-dataset\", \"catalog_id\": \"s3-external\"}",
@@ -547,7 +565,7 @@ var _ = Describe("M4DApplication Controller", func() {
 				By("Expecting plotter to be generated")
 				plotter := &apiv1alpha1.Plotter{}
 				Eventually(func() error {
-					key := types.NamespacedName{Name: resource.Status.Generated.Name, Namespace: resource.Status.Generated.Namespace}
+					key := ktypes.NamespacedName{Name: resource.Status.Generated.Name, Namespace: resource.Status.Generated.Namespace}
 					return k8sClient.Get(context.Background(), key, plotter)
 				}, timeout, interval).Should(Succeed())
 			}

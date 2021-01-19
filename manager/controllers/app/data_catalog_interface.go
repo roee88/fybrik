@@ -37,7 +37,7 @@ func GetConnectionDetails(datasetID string, req *modules.DataInfo, input *app.M4
 		return err
 	}
 
-	req.DataDetails = response.GetDetails().DeepCopy()
+	req.DataDetails = response.GetDetails()
 
 	return nil
 }
@@ -62,7 +62,7 @@ func GetCredentials(datasetID string, req *modules.DataInfo, input *app.M4DAppli
 	if err != nil {
 		return err
 	}
-	req.Credentials = dataCredentials.DeepCopy()
+	req.Credentials = dataCredentials
 
 	return nil
 }

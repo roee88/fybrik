@@ -22,6 +22,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	ctrlutil "sigs.k8s.io/controller-runtime/pkg/controller/controllerutil"
 
+	"github.com/ibm/the-mesh-for-data/manager/controllers/app/types"
 	"github.com/ibm/the-mesh-for-data/manager/controllers/utils"
 	"github.com/ibm/the-mesh-for-data/pkg/helm"
 	corev1 "k8s.io/api/core/v1"
@@ -255,13 +256,6 @@ func (r *BlueprintReconciler) reconcile(ctx context.Context, log logr.Logger, bl
 			continue
 		}
 
-		// Get arguments by type
-		var args map[string]interface{}
-		args, err = utils.StructToMap(step.Arguments)
-		if err != nil {
-			return ctrl.Result{}, errors.WithMessage(err, "Blueprint step arguments are invalid")
-		}
-
 		releaseName := getReleaseName(blueprint.Name, step)
 		log.V(0).Info("Release name: " + releaseName)
 		numReleases++
@@ -269,13 +263,22 @@ func (r *BlueprintReconciler) reconcile(ctx context.Context, log logr.Logger, bl
 		rel, err := r.Helmer.Status(blueprint.Namespace, releaseName)
 		// unexisting release or a failed release - re-apply the chart
 		if updateRequired || err != nil || rel == nil || rel.Info.Status == release.StatusFailed {
+			// Get arguments by type
+			var args map[string]interface{}
+			args, err = utils.StructToMap(step.Arguments)
+			if err != nil {
+				return ctrl.Result{}, errors.WithMessage(err, "Blueprint step arguments are invalid")
+			}
 			// Process templates with arguments
 			chart := templateSpec.Chart
 			if _, err := r.applyChartResource(log, chart, args, blueprint.Namespace, releaseName); err != nil {
 				blueprint.Status.ObservedState.Error += errors.Wrap(err, "ChartDeploymentFailure: ").Error() + "\n"
 			}
 		} else if rel.Info.Status == release.StatusDeployed {
-			if len(step.Arguments.Read) > 0 {
+			// TODO(roee88): identify the user exposed module differently
+			args := &types.ModuleArguments{}
+			_ = args.FromRawExtention(step.Arguments)
+			if len(args.Read) > 0 {
 				blueprint.Status.ObservedState.DataAccessInstructions += rel.Info.Notes
 			}
 			status, errMsg := r.checkReleaseStatus(releaseName, blueprint.Namespace)
