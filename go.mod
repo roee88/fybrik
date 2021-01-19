@@ -27,6 +27,7 @@ require (
 	github.com/rogpeppe/go-internal v1.6.0 // indirect
 	github.com/stretchr/testify v1.6.1
 	google.golang.org/grpc v1.31.1
+	google.golang.org/protobuf v1.25.0
 	gopkg.in/yaml.v2 v2.3.0
 	helm.sh/helm/v3 v3.5.0
 	istio.io/client-go v1.8.2
