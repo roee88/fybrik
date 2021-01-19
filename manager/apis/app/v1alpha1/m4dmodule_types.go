@@ -81,7 +81,7 @@ type Dependency struct {
 
 type SupportedAction struct {
 	// +required
-	Id string `json:"id,omitempty"`
+	ID string `json:"id,omitempty"`
 	// +optional
 	Level connectors.EnforcementAction_EnforcementActionLevel `json:"level,omitempty"`
 }

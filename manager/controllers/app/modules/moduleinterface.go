@@ -98,7 +98,7 @@ func (m *Selector) SupportsGovernanceActions(module *app.M4DModule, actions []*p
 		supportsAction := false
 		for j := range module.Spec.Capabilities.Actions {
 			transformation := &module.Spec.Capabilities.Actions[j]
-			if transformation.Id == action.Id && transformation.Level == action.Level {
+			if transformation.ID == action.Id && transformation.Level == action.Level {
 				supportsAction = true
 				break
 			}
@@ -115,7 +115,7 @@ func (m *Selector) SupportsGovernanceAction(module *app.M4DModule, action *pb.En
 	// Check that the governance actions match
 	for j := range module.Spec.Capabilities.Actions {
 		transformation := &module.Spec.Capabilities.Actions[j]
-		if transformation.Id == action.Id && transformation.Level == action.Level {
+		if transformation.ID == action.Id && transformation.Level == action.Level {
 			return true
 		}
 	}

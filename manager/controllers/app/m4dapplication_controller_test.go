@@ -126,11 +126,11 @@ func CreateDb2ToS3CopyModule() *apiv1alpha1.M4DModule {
 				},
 				Actions: []apiv1alpha1.SupportedAction{
 					{
-						Id:    "redact-ID",
+						ID:    "redact-ID",
 						Level: pb.EnforcementAction_COLUMN,
 					},
 					{
-						Id:    "encrypt-ID",
+						ID:    "encrypt-ID",
 						Level: pb.EnforcementAction_COLUMN,
 					},
 				},
@@ -163,11 +163,11 @@ func CreateS3ToS3CopyModule() *apiv1alpha1.M4DModule {
 				},
 				Actions: []apiv1alpha1.SupportedAction{
 					{
-						Id:    "redact-ID",
+						ID:    "redact-ID",
 						Level: pb.EnforcementAction_COLUMN,
 					},
 					{
-						Id:    "encrypt-ID",
+						ID:    "encrypt-ID",
 						Level: pb.EnforcementAction_COLUMN,
 					},
 				},
