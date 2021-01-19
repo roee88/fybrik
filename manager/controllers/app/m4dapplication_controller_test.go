@@ -19,7 +19,7 @@ import (
 	. "github.com/onsi/gomega"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	ktypes "k8s.io/apimachinery/pkg/ktypes"
+	ktypes "k8s.io/apimachinery/pkg/types"
 )
 
 const timeout = time.Second * 30
