@@ -53,14 +53,14 @@ func LookupPolicyDecisions(datasetID string, policyCompiler pc.IPolicyCompiler, 
 	// initialize Actions structure
 	req.Actions[flow] = modules.Transformations{
 		Allowed:            true,
-		EnforcementActions: make([]pb.EnforcementAction, 0),
+		EnforcementActions: make([]*pb.EnforcementAction, 0),
 	}
 
 	for _, datasetDecision := range pcresponse.GetDatasetDecisions() {
 		if datasetDecision.GetDataset().GetDatasetId() != datasetID {
 			continue // not our data set
 		}
-		var actions []pb.EnforcementAction
+		var actions []*pb.EnforcementAction
 		operationDecisions := datasetDecision.GetDecisions()
 		for _, operationDecision := range operationDecisions {
 			enforcementActions := operationDecision.GetEnforcementActions()
@@ -75,13 +75,13 @@ func LookupPolicyDecisions(datasetID string, policyCompiler pc.IPolicyCompiler, 
 					req.Actions[flow] = modules.Transformations{
 						Allowed:            false,
 						Message:            msg,
-						EnforcementActions: make([]pb.EnforcementAction, 0),
+						EnforcementActions: make([]*pb.EnforcementAction, 0),
 					}
 					return nil
 				}
 				// Check if this is a real action (i.e. not Allow)
 				if utils.IsAction(action.GetName()) {
-					actions = append(actions, *action.DeepCopy())
+					actions = append(actions, action)
 				}
 			}
 		}

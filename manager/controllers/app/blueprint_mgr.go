@@ -45,7 +45,7 @@ func (r *M4DApplicationReconciler) RefineInstances(instances []modules.ModuleIns
 }
 
 // GenerateBlueprints creates Blueprint specs (one per cluster)
-func (r *M4DApplicationReconciler) GenerateBlueprints(instances []modules.ModuleInstanceSpec, appContext *app.M4DApplication) map[string]app.BlueprintSpec {
+func (r *M4DApplicationReconciler) GenerateBlueprints(instances []modules.ModuleInstanceSpec, appContext *app.M4DApplication) (map[string]app.BlueprintSpec, error) {
 	blueprintMap := make(map[string]app.BlueprintSpec)
 	instanceMap := make(map[string][]modules.ModuleInstanceSpec)
 	for _, moduleInstance := range instances {
@@ -54,17 +54,21 @@ func (r *M4DApplicationReconciler) GenerateBlueprints(instances []modules.Module
 	for key, instanceList := range instanceMap {
 		// unite several instances of a read/write module
 		instances := r.RefineInstances(instanceList)
-		blueprintMap[key] = r.GenerateBlueprint(instances, appContext)
+		blueprint, err := r.GenerateBlueprint(instances, appContext)
+		if err != nil {
+			return nil, err
+		}
+		blueprintMap[key] = *blueprint
 	}
 	utils.PrintStructure(blueprintMap, r.Log, "BlueprintMap")
-	return blueprintMap
+	return blueprintMap, nil
 }
 
 // GenerateBlueprint creates the Blueprint spec based on the datasets and the governance actions required, which dictate the modules that must run in the m4d
 // Credentials for accessing data set are stored in a credential management system (such as vault) and the paths for accessing them are included in the blueprint.
 // The credentials themselves are not included in the blueprint.
-func (r *M4DApplicationReconciler) GenerateBlueprint(instances []modules.ModuleInstanceSpec, appContext *app.M4DApplication) app.BlueprintSpec {
-	var spec app.BlueprintSpec
+func (r *M4DApplicationReconciler) GenerateBlueprint(instances []modules.ModuleInstanceSpec, appContext *app.M4DApplication) (*app.BlueprintSpec, error) {
+	spec := &app.BlueprintSpec{}
 
 	// Entrypoint is always the name of the application
 	appName := appContext.GetName()
@@ -86,7 +90,11 @@ func (r *M4DApplicationReconciler) GenerateBlueprint(instances []modules.ModuleI
 		step.Name = appName + "-" + modulename + "-" + utils.Hash(moduleInstance.AssetID, 20) // Need unique name for each step so include ids for dataset
 		step.Template = modulename
 
-		step.Arguments = *moduleInstance.Args
+		args, err := moduleInstance.Args.ToRawExtention()
+		if err != nil {
+			return nil, err
+		}
+		step.Arguments = *args
 
 		steps = append(steps, step)
 
@@ -105,5 +113,5 @@ func (r *M4DApplicationReconciler) GenerateBlueprint(instances []modules.ModuleI
 	spec.Flow = flow
 	spec.Templates = templates
 
-	return spec
+	return spec, nil
 }

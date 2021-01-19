@@ -15,6 +15,7 @@ import (
 	. "github.com/onsi/gomega"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/yaml"
 )
@@ -78,7 +79,8 @@ var _ = Describe("Blueprint Controller", func() {
 				if err := k8sClient.Get(context.Background(), key, f); err != nil {
 					return err
 				}
-				f.Spec.Flow.Steps[0].Arguments.Copy.Destination.Connection.S3.Bucket = "placeholder"
+
+				f.Spec.Flow.Steps[0].Arguments.Raw = []byte(`{"copy": {"destination": {connection: {"s3": {"bucket": "placeholder"}}}}}`)
 				return k8sClient.Update(context.Background(), f)
 			}, timeout, interval).Should(Succeed())
 
@@ -111,7 +113,7 @@ var _ = Describe("Blueprint Controller", func() {
 						Name: "dataflow",
 						Steps: []app.FlowStep{{Name: "mystep",
 							Template:  "template",
-							Arguments: app.ModuleArguments{}}},
+							Arguments: runtime.RawExtension{}}},
 					},
 				},
 			}
@@ -130,7 +132,7 @@ var _ = Describe("Blueprint Controller", func() {
 						Name: "dataflow",
 						Steps: []app.FlowStep{{Name: "ohandnottoforgettheflowstepnamethatincludesthetemplatenameandotherstuff",
 							Template:  "template",
-							Arguments: app.ModuleArguments{}}},
+							Arguments: runtime.RawExtension{}}},
 					},
 				},
 			}

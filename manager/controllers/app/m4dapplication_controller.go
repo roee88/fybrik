@@ -264,7 +264,10 @@ func (r *M4DApplicationReconciler) reconcile(applicationContext *app.M4DApplicat
 		return ctrl.Result{}, nil
 	}
 	// generate blueprint specifications (per cluster)
-	blueprintPerClusterMap := r.GenerateBlueprints(instances, applicationContext)
+	blueprintPerClusterMap, err := r.GenerateBlueprints(instances, applicationContext)
+	if err != nil {
+		return ctrl.Result{}, err
+	}
 	resourceRef, err := r.ResourceInterface.CreateResourceReference(applicationContext.Name, applicationContext.Namespace)
 	if err != nil {
 		return ctrl.Result{}, err
