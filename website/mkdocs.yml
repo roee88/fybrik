@@ -6,7 +6,7 @@ repo_url: https://github.com/ibm/the-mesh-for-data
 edit_uri: edit/master/website/docs/
 
 nav:
-- Home: index.md
+- About: index.md
 - Get Started:
   - get-started/quickstart-v2.md
   - samples/notebook-v2.md
