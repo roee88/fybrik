@@ -2,19 +2,48 @@ package mockup
 
 import (
 	"context"
+	"errors"
+	"log"
+	"strings"
 
-	"github.com/mesh-for-data/mesh-for-data/pkg/connectors"
 	pb "github.com/mesh-for-data/mesh-for-data/pkg/connectors/protobuf"
 )
 
-func CreateDataCatalogMock() connectors.DataCatalog {
+// This dummy catalog can serve as both a grpc server implementation that serves a dummy catalog
+// with dummy datasets and dummy credentials as well as a drop in for the DataCatalog interface
+// without any network traffic.
+type DataCatalogDummy struct {
+	pb.UnimplementedDataCatalogServiceServer
+	dataDetails map[string]pb.CatalogDatasetInfo
+}
 
-	catalog := connectors.NewMockDataCatalog()
+func (d *DataCatalogDummy) GetDatasetInfo(ctx context.Context, in *pb.CatalogDatasetRequest) (*pb.CatalogDatasetInfo, error) {
+	datasetID := in.GetDatasetId()
+	log.Printf("MockDataCatalog.GetDatasetInfo called with DataSetID " + datasetID)
 
-	catalog.RegisterDatasetInfo(context.TODO(), &pb.RegisterAssetRequest{
-		DestinationCatalogId: "s3-external",
-		DatasetDetails: &pb.DatasetDetails{
-			Name:       "default-dataset",
+	splittedID := strings.SplitN(datasetID, "/", 2)
+	catalogID := splittedID[0]
+
+	dataDetails, found := d.dataDetails[catalogID]
+	if found {
+		return &dataDetails, nil
+	}
+
+	return nil, errors.New("could not find data details")
+}
+
+func (d *DataCatalogDummy) Close() error {
+	return nil
+}
+
+func NewTestCatalog() *DataCatalogDummy {
+	dummyCatalog := DataCatalogDummy{
+		dataDetails: make(map[string]pb.CatalogDatasetInfo),
+	}
+	dummyCatalog.dataDetails["s3-external"] = pb.CatalogDatasetInfo{
+		DatasetId: "s3-external",
+		Details: &pb.DatasetDetails{
+			Name:       "xxx",
 			DataFormat: "parquet",
 			Geo:        "Germany",
 			DataStore: &pb.DataStore{
@@ -31,12 +60,11 @@ func CreateDataCatalogMock() connectors.DataCatalog {
 			},
 			Metadata: &pb.DatasetMetadata{DatasetTags: []string{"PI"}},
 		},
-	})
-
-	catalog.RegisterDatasetInfo(context.TODO(), &pb.RegisterAssetRequest{
-		DestinationCatalogId: "s3",
-		DatasetDetails: &pb.DatasetDetails{
-			Name:       "allow-dataset",
+	}
+	dummyCatalog.dataDetails["s3"] = pb.CatalogDatasetInfo{
+		DatasetId: "s3",
+		Details: &pb.DatasetDetails{
+			Name:       "xxx",
 			DataFormat: "parquet",
 			Geo:        "theshire",
 			DataStore: &pb.DataStore{
@@ -53,34 +81,11 @@ func CreateDataCatalogMock() connectors.DataCatalog {
 			},
 			Metadata: &pb.DatasetMetadata{DatasetTags: []string{"PI"}},
 		},
-	})
-
-	catalog.RegisterDatasetInfo(context.TODO(), &pb.RegisterAssetRequest{
-		DestinationCatalogId: "s3",
-		DatasetDetails: &pb.DatasetDetails{
-			Name:       "deny-dataset",
-			DataFormat: "parquet",
-			Geo:        "theshire",
-			DataStore: &pb.DataStore{
-				Type: pb.DataStore_S3,
-				Name: "cos",
-				S3: &pb.S3DataStore{
-					Endpoint:  "s3.eu-gb.cloud-object-storage.appdomain.cloud",
-					Bucket:    "m4d-test-bucket",
-					ObjectKey: "small.parq",
-				},
-			},
-			CredentialsInfo: &pb.CredentialsInfo{
-				VaultSecretPath: "/v1/kubernetes-secrets/creds-secret-name?namespace=m4d-system",
-			},
-			Metadata: &pb.DatasetMetadata{DatasetTags: []string{"PI"}},
-		},
-	})
-
-	catalog.RegisterDatasetInfo(context.TODO(), &pb.RegisterAssetRequest{
-		DestinationCatalogId: "s3-csv",
-		DatasetDetails: &pb.DatasetDetails{
-			Name:       "allow-dataset",
+	}
+	dummyCatalog.dataDetails["s3-csv"] = pb.CatalogDatasetInfo{
+		DatasetId: "s3-csv",
+		Details: &pb.DatasetDetails{
+			Name:       "small.csv",
 			DataFormat: "csv",
 			Geo:        "theshire",
 			DataStore: &pb.DataStore{
@@ -97,12 +102,11 @@ func CreateDataCatalogMock() connectors.DataCatalog {
 			},
 			Metadata: &pb.DatasetMetadata{DatasetTags: []string{"PI"}},
 		},
-	})
-
-	catalog.RegisterDatasetInfo(context.TODO(), &pb.RegisterAssetRequest{
-		DestinationCatalogId: "db2",
-		DatasetDetails: &pb.DatasetDetails{
-			Name:       "default-dataset",
+	}
+	dummyCatalog.dataDetails["db2"] = pb.CatalogDatasetInfo{
+		DatasetId: "db2",
+		Details: &pb.DatasetDetails{
+			Name:       "yyy",
 			DataFormat: "table",
 			Geo:        "theshire",
 			DataStore: &pb.DataStore{
@@ -121,36 +125,11 @@ func CreateDataCatalogMock() connectors.DataCatalog {
 			},
 			Metadata: &pb.DatasetMetadata{},
 		},
-	})
-
-	catalog.RegisterDatasetInfo(context.TODO(), &pb.RegisterAssetRequest{
-		DestinationCatalogId: "db2",
-		DatasetDetails: &pb.DatasetDetails{
-			Name:       "allow-dataset",
-			DataFormat: "table",
-			Geo:        "theshire",
-			DataStore: &pb.DataStore{
-				Type: pb.DataStore_DB2,
-				Name: "db2",
-				Db2: &pb.Db2DataStore{
-					Database: "BLUDB",
-					Table:    "NQD60833.SMALL",
-					Url:      "dashdb-txn-sbox-yp-lon02-02.services.eu-gb.bluemix.net",
-					Port:     "50000",
-					Ssl:      "false",
-				},
-			},
-			CredentialsInfo: &pb.CredentialsInfo{
-				VaultSecretPath: "/v1/kubernetes-secrets/creds-secret-name?namespace=m4d-system",
-			},
-			Metadata: &pb.DatasetMetadata{},
-		},
-	})
-
-	catalog.RegisterDatasetInfo(context.TODO(), &pb.RegisterAssetRequest{
-		DestinationCatalogId: "kafka",
-		DatasetDetails: &pb.DatasetDetails{
-			Name:       "allow-dataset",
+	}
+	dummyCatalog.dataDetails["kafka"] = pb.CatalogDatasetInfo{
+		DatasetId: "kafka",
+		Details: &pb.DatasetDetails{
+			Name:       "Cars",
 			DataFormat: "json",
 			Geo:        "theshire",
 			DataStore: &pb.DataStore{
@@ -173,7 +152,7 @@ func CreateDataCatalogMock() connectors.DataCatalog {
 			},
 			Metadata: &pb.DatasetMetadata{},
 		},
-	})
+	}
 
-	return catalog
+	return &dummyCatalog
 }

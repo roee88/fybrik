@@ -46,8 +46,8 @@ func createTestM4DApplicationController(cl client.Client, s *runtime.Scheme) *M4
 		Name:          "TestReconciler",
 		Log:           ctrl.Log.WithName("test-controller"),
 		Scheme:        s,
-		PolicyManager: mockup.CreatePolicyManagerMock(),
-		DataCatalog:   mockup.CreateDataCatalogMock(),
+		PolicyManager: &mockup.MockPolicyManager{},
+		DataCatalog:   mockup.NewTestCatalog(),
 		ResourceInterface: &PlotterInterface{
 			Client: cl,
 		},

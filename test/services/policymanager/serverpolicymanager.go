@@ -27,7 +27,7 @@ func main() {
 	}
 
 	server := grpc.NewServer()
-	service := mockup.CreatePolicyManagerMock()
+	service := &mockup.MockPolicyManager{}
 
 	pb.RegisterPolicyManagerServiceServer(server, service)
 	if err := server.Serve(listener); err != nil {

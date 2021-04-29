@@ -27,7 +27,7 @@ func main() {
 	}
 
 	server := grpc.NewServer()
-	service := mockup.CreateDataCatalogMock()
+	service := mockup.NewTestCatalog()
 
 	pb.RegisterDataCatalogServiceServer(server, service)
 	if err := server.Serve(listener); err != nil {
