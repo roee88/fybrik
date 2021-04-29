@@ -42,17 +42,17 @@ func readObjectFromFile(f string, obj interface{}) error {
 func createTestM4DApplicationController(cl client.Client, s *runtime.Scheme) *M4DApplicationReconciler {
 	// Create a M4DApplicationReconciler object with the scheme and fake client.
 	return &M4DApplicationReconciler{
-		Client:         cl,
-		Name:           "TestReconciler",
-		Log:            ctrl.Log.WithName("test-controller"),
-		Scheme:         s,
-		PolicyCompiler: &mockup.MockPolicyCompiler{},
+		Client:        cl,
+		Name:          "TestReconciler",
+		Log:           ctrl.Log.WithName("test-controller"),
+		Scheme:        s,
+		PolicyManager: mockup.CreatePolicyManagerMock(),
+		DataCatalog:   mockup.CreateDataCatalogMock(),
 		ResourceInterface: &PlotterInterface{
 			Client: cl,
 		},
 		ClusterManager: &mockup.ClusterLister{},
 		Provision:      &storage.ProvisionTest{},
-		DataCatalog:    mockup.NewTestCatalog(),
 	}
 }
 
