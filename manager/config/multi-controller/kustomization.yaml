@@ -17,5 +17,5 @@ images:
   newName: localhost:5000/m4d-system/data-catalog-mock
   newTag: latest
 - name: policycompiler
-  newName: localhost:5000/m4d-system/serverpolicycompiler-mock
+  newName: localhost:5000/m4d-system/serverpolicymanager-mock
   newTag: latest

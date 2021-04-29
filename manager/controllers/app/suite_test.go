@@ -84,9 +84,6 @@ var _ = BeforeSuite(func(done Done) {
 		k8sClient, err = client.New(cfg, client.Options{Scheme: scheme.Scheme})
 		Expect(err).ToNot(HaveOccurred())
 	} else {
-		// Mockup connectors
-		go mockup.CreateTestCatalogConnector(GinkgoT())
-
 		mgr, err = ctrl.NewManager(cfg, ctrl.Options{
 			Scheme:             scheme.Scheme,
 			MetricsBindAddress: "localhost:8086",
@@ -94,12 +91,12 @@ var _ = BeforeSuite(func(done Done) {
 		Expect(err).ToNot(HaveOccurred())
 
 		// Setup application controller
-		var clusterLister *mockup.ClusterLister
-		policyCompiler := &mockup.MockPolicyCompiler{}
-		conn := vault.NewDummyConnection()
-		reconciler, err := NewM4DApplicationReconciler(mgr, "M4DApplication", conn, policyCompiler, clusterLister, storage.NewProvisionTest())
-		Expect(err).ToNot(HaveOccurred())
-		err = reconciler.SetupWithManager(mgr)
+		clusterLister := &mockup.ClusterLister{}
+		policyManager := mockup.CreatePolicyManagerMock()
+		catalog := mockup.CreateDataCatalogMock()
+		vaultConnection := vault.NewDummyConnection()
+
+		err = NewM4DApplicationReconciler(mgr, "M4DApplication", vaultConnection, policyManager, catalog, clusterLister, storage.NewProvisionTest()).SetupWithManager(mgr)
 		Expect(err).ToNot(HaveOccurred())
 
 		// Setup blueprint controller
@@ -156,6 +153,5 @@ var _ = AfterSuite(func() {
 	By("tearing down the test environment")
 	gexec.KillAndWait(5 * time.Second)
 	err := testEnv.Stop()
-	mockup.KillServer()
 	Expect(err).ToNot(HaveOccurred())
 })

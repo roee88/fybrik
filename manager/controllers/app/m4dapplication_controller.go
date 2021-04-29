@@ -26,12 +26,12 @@ import (
 	app "github.com/ibm/the-mesh-for-data/manager/apis/app/v1alpha1"
 	"github.com/ibm/the-mesh-for-data/manager/controllers/app/modules"
 	"github.com/ibm/the-mesh-for-data/manager/controllers/utils"
+	"github.com/ibm/the-mesh-for-data/pkg/connectors"
 	"github.com/ibm/the-mesh-for-data/pkg/multicluster"
 	"github.com/ibm/the-mesh-for-data/pkg/serde"
 	"github.com/ibm/the-mesh-for-data/pkg/storage"
 	"github.com/ibm/the-mesh-for-data/pkg/vault"
 
-	pc "github.com/ibm/the-mesh-for-data/pkg/policy-compiler/policy-compiler"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -43,11 +43,11 @@ type M4DApplicationReconciler struct {
 	Log               logr.Logger
 	Scheme            *runtime.Scheme
 	VaultConnection   vault.Interface
-	PolicyCompiler    pc.IPolicyCompiler
+	PolicyManager     connectors.PolicyManager
+	DataCatalog       connectors.DataCatalog
 	ResourceInterface ContextInterface
 	ClusterManager    multicluster.ClusterLister
 	Provision         storage.ProvisionInterface
-	DataCatalog       DataCatalog
 }
 
 // Reconcile reconciles M4DApplication CRD
@@ -311,7 +311,7 @@ func (r *M4DApplicationReconciler) reconcile(applicationContext *app.M4DApplicat
 		Modules:            moduleMap,
 		Clusters:           clusters,
 		Owner:              objectKey,
-		PolicyCompiler:     r.PolicyCompiler,
+		PolicyManager:      r.PolicyManager,
 		Provision:          r.Provision,
 		VaultConnection:    r.VaultConnection,
 		ProvisionedStorage: make(map[string]NewAssetInfo),
@@ -389,10 +389,9 @@ func (r *M4DApplicationReconciler) reconcile(applicationContext *app.M4DApplicat
 }
 
 func (r *M4DApplicationReconciler) constructDataInfo(req *modules.DataInfo, input *app.M4DApplication, clusters []multicluster.Cluster) error {
-	datasetID := req.Context.DataSetID
 	var err error
-	// Call the DataCatalog service to get info about the dataset
 
+	// Call the DataCatalog service to get info about the dataset
 	var response *pb.CatalogDatasetInfo
 	var credentialPath string
 	if input.Spec.SecretRef != "" {
@@ -424,43 +423,39 @@ func (r *M4DApplicationReconciler) constructDataInfo(req *modules.DataInfo, inpu
 		credentialPath = vault.PathForReadingKubeSecret(input.Namespace, input.Spec.SecretRef)
 	}
 
-	// Call the CredentialsManager service to get info about the dataset
-	dataCredentials, err := r.DataCatalog.GetCredentialsInfo(ctx, &pb.DatasetCredentialsRequest{
-		DatasetId:      req.Context.DataSetID,
-		CredentialPath: credentialPath})
-	if err != nil {
-		return err
-	}
-	req.Credentials = dataCredentials
+	// // Call the CredentialsManager service to get info about the dataset
+	// dataCredentials, err := r.DataCatalog.GetCredentialsInfo(ctx, &pb.DatasetCredentialsRequest{
+	// 	DatasetId:      req.Context.DataSetID,
+	// 	CredentialPath: credentialPath})
+	// if err != nil {
+	// 	return err
+	// }
+	// req.Credentials = dataCredentials
 
-	// The received credentials are stored in vault
-	path := utils.GetVaultDatasetHome() + datasetID
-	r.Log.V(0).Info("Registering a secret to " + path)
-	if err = r.VaultConnection.AddSecretFromStruct(path, req.Credentials.GetCreds()); err != nil {
-		return AnalyzeError(input, r.Log, datasetID, err)
-	}
+	// // The received credentials are stored in vault
+	// path := utils.GetVaultDatasetHome() + datasetID
+	// r.Log.V(0).Info("Registering a secret to " + path)
+	// if err = r.VaultConnection.AddSecretFromStruct(path, req.Credentials.GetCreds()); err != nil {
+	// 	return AnalyzeError(input, r.Log, datasetID, err)
+	// }
 	return nil
 }
 
 // NewM4DApplicationReconciler creates a new reconciler for M4DApplications
 func NewM4DApplicationReconciler(mgr ctrl.Manager, name string, vaultConnection vault.Interface,
-	policyCompiler pc.IPolicyCompiler, cm multicluster.ClusterLister, provision storage.ProvisionInterface) (*M4DApplicationReconciler, error) {
-	catalog, err := NewGrpcDataCatalog()
-	if err != nil {
-		return nil, err
-	}
+	policyManager connectors.PolicyManager, catalog connectors.DataCatalog, cm multicluster.ClusterLister, provision storage.ProvisionInterface) *M4DApplicationReconciler {
 	return &M4DApplicationReconciler{
 		Client:            mgr.GetClient(),
 		Name:              name,
 		Log:               ctrl.Log.WithName("controllers").WithName(name),
 		Scheme:            mgr.GetScheme(),
 		VaultConnection:   vaultConnection,
-		PolicyCompiler:    policyCompiler,
+		PolicyManager:     policyManager,
 		ResourceInterface: NewPlotterInterface(mgr.GetClient()),
 		ClusterManager:    cm,
 		Provision:         provision,
 		DataCatalog:       catalog,
-	}, nil
+	}
 }
 
 // SetupWithManager registers M4DApplication controller

@@ -100,7 +100,7 @@ func TestM4DApplicationControllerCSVCopyAndRead(t *testing.T) {
 	err = cl.Create(context.Background(), dummySecret)
 	g.Expect(err).NotTo(gomega.HaveOccurred())
 
-	dummyCatalog := mockup.NewTestCatalog()
+	dummyCatalog := mockup.CreateDataCatalogMock()
 
 	// Create a M4DApplicationReconciler object with the scheme and fake client.
 	r := &M4DApplicationReconciler{
@@ -109,7 +109,7 @@ func TestM4DApplicationControllerCSVCopyAndRead(t *testing.T) {
 		Log:             ctrl.Log.WithName("test-controller"),
 		Scheme:          s,
 		VaultConnection: vault.NewDummyConnection(),
-		PolicyCompiler:  &mockup.MockPolicyCompiler{},
+		PolicyManager:   mockup.CreatePolicyManagerMock(),
 		ResourceInterface: &PlotterInterface{
 			Client: cl,
 		},

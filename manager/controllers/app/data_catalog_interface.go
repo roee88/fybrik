@@ -5,12 +5,10 @@ package app
 
 import (
 	"context"
-	"io"
 	"time"
 
 	"encoding/json"
 
-	"emperror.dev/errors"
 	"google.golang.org/grpc"
 
 	app "github.com/ibm/the-mesh-for-data/manager/apis/app/v1alpha1"
@@ -22,60 +20,6 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 )
-
-// DataCatalog is an interface of a facade to a data catalog.
-type DataCatalog interface {
-	pb.DataCatalogServiceServer
-	pb.DataCredentialServiceServer
-	io.Closer
-}
-
-type DataCatalogImpl struct {
-	catalogClient        pb.DataCatalogServiceClient
-	credentialClient     pb.DataCredentialServiceClient
-	catalogConnection    *grpc.ClientConn
-	credentialConnection *grpc.ClientConn
-}
-
-func NewGrpcDataCatalog() (*DataCatalogImpl, error) {
-	catalogConnection, err := grpc.Dial(utils.GetDataCatalogServiceAddress(), grpc.WithInsecure(), grpc.WithBlock())
-	if err != nil {
-		return nil, err
-	}
-
-	credentialConnection, err := grpc.Dial(utils.GetCredentialsManagerServiceAddress(), grpc.WithInsecure(), grpc.WithBlock())
-	if err != nil {
-		return nil, err
-	}
-
-	return &DataCatalogImpl{
-		catalogClient:        pb.NewDataCatalogServiceClient(catalogConnection),
-		credentialClient:     pb.NewDataCredentialServiceClient(credentialConnection),
-		catalogConnection:    catalogConnection,
-		credentialConnection: credentialConnection,
-	}, nil
-}
-
-func (d *DataCatalogImpl) GetDatasetInfo(ctx context.Context, req *pb.CatalogDatasetRequest) (*pb.CatalogDatasetInfo, error) {
-	result, err := d.catalogClient.GetDatasetInfo(ctx, req)
-	return result, errors.Wrap(err, "get dataset info failed")
-}
-
-func (d *DataCatalogImpl) RegisterDatasetInfo(ctx context.Context, req *pb.RegisterAssetRequest) (*pb.RegisterAssetResponse, error) {
-	result, err := d.catalogClient.RegisterDatasetInfo(ctx, req)
-	return result, errors.Wrap(err, "register dataset info failed")
-}
-
-func (d *DataCatalogImpl) GetCredentialsInfo(ctx context.Context, req *pb.DatasetCredentialsRequest) (*pb.DatasetCredentials, error) {
-	result, err := d.credentialClient.GetCredentialsInfo(ctx, req)
-	return result, errors.Wrap(err, "get credentials info failed")
-}
-
-func (d *DataCatalogImpl) Close() error {
-	err1 := d.catalogConnection.Close()
-	err2 := d.credentialConnection.Close()
-	return errors.Combine(err1, err2)
-}
 
 // RegisterAsset registers a new asset in the specified catalog
 // Input arguments:

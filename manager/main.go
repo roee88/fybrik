@@ -6,8 +6,12 @@ package main
 import (
 	"flag"
 	"os"
+	"strconv"
 	"strings"
+	"time"
 
+	"emperror.dev/errors"
+	"github.com/ibm/the-mesh-for-data/pkg/connectors"
 	"github.com/ibm/the-mesh-for-data/pkg/multicluster"
 	"github.com/ibm/the-mesh-for-data/pkg/multicluster/local"
 	"github.com/ibm/the-mesh-for-data/pkg/multicluster/razee"
@@ -29,7 +33,6 @@ import (
 	"github.com/ibm/the-mesh-for-data/manager/controllers/app"
 	"github.com/ibm/the-mesh-for-data/manager/controllers/utils"
 	"github.com/ibm/the-mesh-for-data/pkg/helm"
-	pc "github.com/ibm/the-mesh-for-data/pkg/policy-compiler/policy-compiler"
 	// +kubebuilder:scaffold:imports
 )
 
@@ -125,7 +128,7 @@ func main() {
 	// Initialize ClusterManager
 	var clusterManager multicluster.ClusterManager
 	if enableApplicationController || enablePlotterController {
-		clusterManager, err = NewClusterManager(mgr)
+		clusterManager, err = newClusterManager(mgr)
 		if err != nil {
 			setupLog.Error(err, "unable to initialize cluster manager")
 			os.Exit(1)
@@ -140,15 +143,32 @@ func main() {
 			os.Exit(1)
 		}
 
-		// Initialize PolicyCompiler interface
-		policyCompiler := pc.NewPolicyCompiler()
-
-		// Initiate the M4DApplication Controller
-		applicationController, err := app.NewM4DApplicationReconciler(mgr, "M4DApplication", vaultConn, policyCompiler, clusterManager, storage.NewProvisionImpl(mgr.GetClient()))
+		// Initialize PolicyManager interface
+		policyManager, err := newPolicyManager()
 		if err != nil {
-			setupLog.Error(err, "unable to create controller")
+			setupLog.Error(err, "unable to create policy manager facade", "controller", "M4DApplication")
 			os.Exit(1)
 		}
+		defer func() {
+			if err := policyManager.Close(); err != nil {
+				setupLog.Error(err, "unable to close policy manager facade", "controller", "M4DApplication")
+			}
+		}()
+
+		// Initialize DataCatalog interface
+		catalog, err := newDataCatalog()
+		if err != nil {
+			setupLog.Error(err, "unable to create data catalog facade", "controller", "M4DApplication")
+			os.Exit(1)
+		}
+		defer func() {
+			if err := catalog.Close(); err != nil {
+				setupLog.Error(err, "unable to close data catalog facade", "controller", "M4DApplication")
+			}
+		}()
+
+		// Initiate the M4DApplication Controller
+		applicationController := app.NewM4DApplicationReconciler(mgr, "M4DApplication", vaultConn, policyManager, catalog, clusterManager, storage.NewProvisionImpl(mgr.GetClient()))
 		if err := applicationController.SetupWithManager(mgr); err != nil {
 			setupLog.Error(err, "unable to create controller", "controller", "M4DApplication")
 			os.Exit(1)
@@ -198,10 +218,53 @@ func initVaultConnection() (vault.Interface, error) {
 	return vaultConn, nil
 }
 
-// NewClusterManager decides based on the environment variables that are set which
+func newDataCatalog() (connectors.DataCatalog, error) {
+	connectionTimeout, err := getConnectionTimeout()
+	if err != nil {
+		return nil, err
+	}
+	providerName := os.Getenv("CATALOG_PROVIDER_NAME")
+	connectorURL := os.Getenv("CATALOG_CONNECTOR_URL")
+	connector, err := connectors.NewGrpcDataCatalog(providerName, connectorURL, connectionTimeout)
+	setupLog.Info("setting data catalog client", "Name", providerName, "URL", connectorURL, "Timeout", connectionTimeout)
+	if err != nil {
+		return nil, err
+	}
+	return connector, nil
+}
+
+func newPolicyManager() (connectors.PolicyManager, error) {
+	connectionTimeout, err := getConnectionTimeout()
+	if err != nil {
+		return nil, err
+	}
+
+	mainPolicyManagerName := os.Getenv("MAIN_POLICY_MANAGER_NAME")
+	mainPolicyManagerURL := os.Getenv("MAIN_POLICY_MANAGER_CONNECTOR_URL")
+	setupLog.Info("setting main policy manager client", "Name", mainPolicyManagerName, "URL", mainPolicyManagerURL, "Timeout", connectionTimeout)
+	policyManager, err := connectors.NewGrpcPolicyManager(mainPolicyManagerName, mainPolicyManagerURL, connectionTimeout)
+	if err != nil {
+		return nil, err
+	}
+
+	useExtensionPolicyManager, err := strconv.ParseBool(os.Getenv("USE_EXTENSIONPOLICY_MANAGER"))
+	if useExtensionPolicyManager && err == nil {
+		extensionPolicyManagerName := os.Getenv("EXTENSIONS_POLICY_MANAGER_NAME")
+		extensionPolicyManagerURL := os.Getenv("EXTENSIONS_POLICY_MANAGER_CONNECTOR_URL")
+		setupLog.Info("setting extension policy manager client", "Name", extensionPolicyManagerName, "URL", extensionPolicyManagerURL, "Timeout", connectionTimeout)
+		extensionPolicyManager, err := connectors.NewGrpcPolicyManager(extensionPolicyManagerName, extensionPolicyManagerURL, connectionTimeout)
+		if err != nil {
+			return nil, err
+		}
+		policyManager = connectors.NewMultiPolicyManager(policyManager, extensionPolicyManager)
+	}
+
+	return policyManager, nil
+}
+
+// newClusterManager decides based on the environment variables that are set which
 // cluster manager instance should be initiated.
-func NewClusterManager(mgr manager.Manager) (multicluster.ClusterManager, error) {
-	setupLog := ctrl.Log.WithName("setup")
+func newClusterManager(mgr manager.Manager) (multicluster.ClusterManager, error) {
 	multiClusterGroup := os.Getenv("MULTICLUSTER_GROUP")
 	if user, razeeLocal := os.LookupEnv("RAZEE_USER"); razeeLocal {
 		razeeURL := strings.TrimSpace(os.Getenv("RAZEE_URL"))
@@ -221,4 +284,13 @@ func NewClusterManager(mgr manager.Manager) (multicluster.ClusterManager, error)
 		setupLog.Info("Using local cluster manager")
 		return local.NewManager(mgr.GetClient(), utils.GetSystemNamespace())
 	}
+}
+
+func getConnectionTimeout() (time.Duration, error) {
+	connectionTimeout := os.Getenv("CONNECTION_TIMEOUT")
+	timeOutInSeconds, err := strconv.Atoi(connectionTimeout)
+	if err != nil {
+		return 0, errors.Wrap(err, "Atoi conversion of CONNECTION_TIMEOUT failed")
+	}
+	return time.Duration(timeOutInSeconds) * time.Second, nil
 }
