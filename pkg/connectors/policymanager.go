@@ -24,12 +24,12 @@ func MergePoliciesDecisions(in ...*pb.PoliciesDecisions) *pb.PoliciesDecisions {
 		result.DatasetDecisions = append(result.DatasetDecisions, decisions.DatasetDecisions...)
 	}
 
-	result = CompactPolicyDecisions(result)
+	result = compactPolicyDecisions(result)
 	return result
 }
 
-// CompactPolicyDecisions compacts policy decisions by merging decisions of same dataset identifier and same operation.
-func CompactPolicyDecisions(in *pb.PoliciesDecisions) *pb.PoliciesDecisions {
+// compactPolicyDecisions compacts policy decisions by merging decisions of same dataset identifier and same operation.
+func compactPolicyDecisions(in *pb.PoliciesDecisions) *pb.PoliciesDecisions {
 	if in == nil {
 		return nil
 	}
@@ -41,10 +41,12 @@ func CompactPolicyDecisions(in *pb.PoliciesDecisions) *pb.PoliciesDecisions {
 	}
 
 	// Group and flatten decisions by dataset id
+	decisionsByIdKeys := []string{} // for determitistric results
 	decisionsById := map[string]*pb.DatasetDecision{}
 	for _, datasetDecision := range in.DatasetDecisions {
 		datasetID := datasetDecision.Dataset.DatasetId
 		if _, exists := decisionsById[datasetID]; !exists {
+			decisionsByIdKeys = append(decisionsByIdKeys, datasetID)
 			decisionsById[datasetID] = &pb.DatasetDecision{
 				Dataset: datasetDecision.Dataset,
 			}
@@ -53,7 +55,8 @@ func CompactPolicyDecisions(in *pb.PoliciesDecisions) *pb.PoliciesDecisions {
 	}
 
 	// Compact DatasetDecisions
-	for _, datasetDecision := range decisionsById {
+	for _, key := range decisionsByIdKeys {
+		datasetDecision := decisionsById[key]
 		result.DatasetDecisions = append(result.DatasetDecisions, &pb.DatasetDecision{
 			Dataset:   datasetDecision.Dataset,
 			Decisions: compactOperationDecisions(datasetDecision.Decisions),
@@ -64,13 +67,19 @@ func CompactPolicyDecisions(in *pb.PoliciesDecisions) *pb.PoliciesDecisions {
 }
 
 func compactOperationDecisions(in []*pb.OperationDecision) []*pb.OperationDecision {
+	if len(in) == 0 {
+		return nil
+	}
+
 	type operationKeyType [2]interface{}
 
 	// Group and flatten decisions for a specific dataset id by operation
+	decisionsByOperationKeys := []operationKeyType{} // for determitistric results
 	decisionsByOperation := map[operationKeyType]*pb.OperationDecision{}
 	for _, operationDecision := range in {
 		key := operationKeyType{operationDecision.Operation.Type, operationDecision.Operation.Destination}
 		if _, exists := decisionsByOperation[key]; !exists {
+			decisionsByOperationKeys = append(decisionsByOperationKeys, key)
 			decisionsByOperation[key] = &pb.OperationDecision{
 				Operation: operationDecision.Operation,
 			}
@@ -80,7 +89,8 @@ func compactOperationDecisions(in []*pb.OperationDecision) []*pb.OperationDecisi
 	}
 
 	decisions := make([]*pb.OperationDecision, 0, len(decisionsByOperation))
-	for _, decision := range decisionsByOperation {
+	for _, key := range decisionsByOperationKeys {
+		decision := decisionsByOperation[key]
 		decisions = append(decisions, decision)
 	}
 
