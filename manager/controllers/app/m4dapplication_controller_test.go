@@ -81,7 +81,7 @@ var _ = Describe("M4DApplication Controller", func() {
 
 			By("Status should contain the details of the endpoint")
 			Expect(len(application.Status.ReadEndpointsMap)).To(Equal(1))
-			fqdn := "notebook-default-read-path-574234f860.m4d-blueprints.svc.cluster.local"
+			fqdn := "test-app-e2e-default-read-module-test-e2e-574234f860.m4d-blueprints.svc.cluster.local"
 			Expect(application.Status.ReadEndpointsMap["s3/allow-dataset"]).To(Equal(apiv1alpha1.EndpointSpec{
 				Hostname: fqdn,
 				Port:     80,
