@@ -1,6 +1,5 @@
 {
     "$schema": "http://json-schema.org/draft-04/schema#",
-    "$id": "catalog.values.schema.json",
     "title": "Data Catalog Values",
     "description": "Values defined in the data catalog.",
     "definitions": {
@@ -36,14 +35,5 @@
                 "additionalProperties": true
             }
         }
-    },
-    "properties": {
-        "geography_name": { "$ref": "#/definitions/geography_name" },
-        "geography_type": { "$ref": "#/definitions/geography_type" },
-        "data_format": { "$ref": "#/definitions/data_format" },
-        "data_type": { "$ref": "#/definitions/data_type" },
-        "valid_metadata": { "$ref:": "#/defintions/valid_metadata" }
-    },
-    "additionalProperties": false
-
+    }
 }

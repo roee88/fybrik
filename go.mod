@@ -9,12 +9,11 @@ require (
 	github.com/buger/jsonparser v1.1.1
 	github.com/containerd/continuity v0.0.0-20201119173150-04c754faca46 // indirect
 	github.com/datashim-io/datashim/src/dataset-operator v0.0.0-20210322095623-e5d70b250696
-	github.com/deepmap/oapi-codegen v1.4.2 // indirect
+	github.com/getkin/kin-openapi v0.61.0
 	github.com/ghodss/yaml v1.0.1-0.20190212211648-25d852aebe32
 	github.com/go-chi/chi v4.1.2+incompatible
 	github.com/go-chi/render v1.0.1
 	github.com/go-logr/logr v0.1.0
-	github.com/go-openapi/jsonpointer v0.19.5 // indirect
 	github.com/go-openapi/spec v0.19.6 // indirect
 	github.com/go-openapi/swag v0.19.7 // indirect
 	github.com/gogo/protobuf v1.3.1
@@ -28,6 +27,7 @@ require (
 	github.com/hashicorp/vault/api v1.0.5-0.20201001211907-38d91b749c77
 	github.com/mailru/easyjson v0.7.1-0.20191009090205-6c0755d89d1e // indirect
 	github.com/mattn/go-runewidth v0.0.7 // indirect
+	github.com/mesh-for-data/openapi2crd v0.3.0
 	github.com/miekg/dns v1.1.17 // indirect
 	github.com/onsi/ginkgo v1.14.2
 	github.com/onsi/gomega v1.10.3
@@ -37,7 +37,8 @@ require (
 	github.com/robfig/cron v1.2.0
 	github.com/shirou/gopsutil v3.20.11+incompatible // indirect
 	github.com/sirupsen/logrus v1.7.0 // indirect
-	github.com/spf13/cobra v1.1.1
+	github.com/spf13/cobra v1.1.3
+	github.com/spf13/viper v1.7.1
 	github.com/stretchr/testify v1.6.1
 	github.com/xeipuuv/gojsonschema v1.2.0
 	go.opencensus.io v0.23.0 // indirect
@@ -54,12 +55,12 @@ require (
 	google.golang.org/grpc v1.36.0
 	google.golang.org/protobuf v1.25.0
 	gopkg.in/ini.v1 v1.51.1 // indirect
-	gopkg.in/yaml.v2 v2.3.0
+	gopkg.in/yaml.v2 v2.4.0
 	gotest.tools v2.2.0+incompatible
 	helm.sh/helm/v3 v3.2.4
 	k8s.io/api v0.19.7
-	k8s.io/apiextensions-apiserver v0.19.7 // indirect
-	k8s.io/apimachinery v0.19.7
+	k8s.io/apiextensions-apiserver v0.21.0
+	k8s.io/apimachinery v0.21.0
 	k8s.io/cli-runtime v0.18.6
 	k8s.io/client-go v12.0.0+incompatible
 	rsc.io/letsencrypt v0.0.3 // indirect
