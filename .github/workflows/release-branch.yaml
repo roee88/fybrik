@@ -17,15 +17,4 @@ jobs:
     - uses: EndBug/add-and-commit@v7
       with:
         default_author: github_actions
-    - name: 'Create new tag'
-      if: success()
-      uses: actions/github-script@v4.0.2
-      with:
-        github-token: ${{ secrets.TAG_PSAT }}
-        script: |
-          github.git.createRef({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            ref: "refs/tags/v${{ steps.version.outputs.version }}",
-            sha: context.sha
-          })
+        tag: 'v${{ steps.version.outputs.version }}'
