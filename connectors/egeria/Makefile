@@ -28,24 +28,5 @@ run:
 terminate:
 	kill -9 $$( cat pids.txt ); rm -f pids.txt
 
-IMAGE := egr-connector
-
-kustomization.yaml: kustomization.yaml.in
-	cp $< $@
-
-.PHONY: deploy
-deploy: kustomization.yaml
-	kustomize edit set image $(IMAGE)=${DOCKER_HOSTNAME}/${DOCKER_NAMESPACE}/$(IMAGE):${DOCKER_TAGNAME}
-	kustomize build . | kubectl apply -f -
-
-.PHONY: undeploy
-undeploy: kustomization.yaml
-	kustomize edit set image $(IMAGE)=${DOCKER_HOSTNAME}/${DOCKER_NAMESPACE}/$(IMAGE):${DOCKER_TAGNAME}
-	kustomize build . | kubectl delete -f -
-
-.PHONY: charts
-charts: kustomization.yaml
-	cp egr_connector.yaml ${ROOT_DIR}/charts/m4d/templates/.
-
 -include ${ROOT_DIR}/.env
 .EXPORT_ALL_VARIABLES:

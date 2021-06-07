@@ -11,13 +11,16 @@ make build
 
 Cleanup with `make clean`
 
-## Build the connector docker image
+## Build and push the connector image
+
+Set the following environment variables to point to a container registry: `DOCKER_USERNAME`, `DOCKER_PASSWORD`, `DOCKER_HOSTNAME` (defaults to "ghcr.io"), `DOCKER_NAMESPACE` (defaults to "mesh-for-date"), `DOCKER_TAGNAME` (defaults to "latest").
+Then run:
 
 ```bash
-make build docker
+make docker-build docker-push
 ```
 
-Cleanup with `make clean docker-clean`
+Cleanup with `make clean docker-rmi`
 
 ## Running tests
 

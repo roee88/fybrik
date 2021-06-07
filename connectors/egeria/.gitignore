@@ -6,3 +6,5 @@ kustomization.yaml
 .factorypath
 .project
 .settings/
+
+*.log
