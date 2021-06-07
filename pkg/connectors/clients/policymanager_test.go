@@ -1,10 +1,10 @@
-package connectors_test
+package clients_test
 
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	"github.com/mesh-for-data/mesh-for-data/pkg/connectors"
+	"github.com/mesh-for-data/mesh-for-data/pkg/connectors/clients"
 	pb "github.com/mesh-for-data/mesh-for-data/pkg/connectors/protobuf"
 )
 
@@ -49,7 +49,7 @@ var _ = Describe("PolicyManager", func() {
 								},
 							},
 						}}}
-						Expect(connectors.MergePoliciesDecisions(left, right)).To(Equal(expected))
+						Expect(clients.MergePoliciesDecisions(left, right)).To(Equal(expected))
 					})
 				})
 
@@ -82,7 +82,7 @@ var _ = Describe("PolicyManager", func() {
 								},
 							},
 						}}}
-						Expect(connectors.MergePoliciesDecisions(left, right)).To(Equal(expected))
+						Expect(clients.MergePoliciesDecisions(left, right)).To(Equal(expected))
 					})
 				})
 			})
@@ -122,7 +122,7 @@ var _ = Describe("PolicyManager", func() {
 								},
 							},
 						}}}
-						Expect(connectors.MergePoliciesDecisions(left, right)).To(Equal(expected))
+						Expect(clients.MergePoliciesDecisions(left, right)).To(Equal(expected))
 					})
 				})
 
@@ -169,7 +169,7 @@ var _ = Describe("PolicyManager", func() {
 						},
 					},
 				}}
-				Expect(connectors.MergePoliciesDecisions(left, right)).To(Equal(expected))
+				Expect(clients.MergePoliciesDecisions(left, right)).To(Equal(expected))
 			})
 		})
 

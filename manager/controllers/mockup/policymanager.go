@@ -8,7 +8,7 @@ import (
 	"log"
 	"strings"
 
-	"github.com/mesh-for-data/mesh-for-data/pkg/connectors"
+	connectors "github.com/mesh-for-data/mesh-for-data/pkg/connectors/clients"
 	pb "github.com/mesh-for-data/mesh-for-data/pkg/connectors/protobuf"
 )
 

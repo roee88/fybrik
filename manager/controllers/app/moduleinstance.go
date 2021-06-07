@@ -11,7 +11,7 @@ import (
 	app "github.com/mesh-for-data/mesh-for-data/manager/apis/app/v1alpha1"
 	modules "github.com/mesh-for-data/mesh-for-data/manager/controllers/app/modules"
 	"github.com/mesh-for-data/mesh-for-data/manager/controllers/utils"
-	"github.com/mesh-for-data/mesh-for-data/pkg/connectors"
+	connectors "github.com/mesh-for-data/mesh-for-data/pkg/connectors/clients"
 	pb "github.com/mesh-for-data/mesh-for-data/pkg/connectors/protobuf"
 	"github.com/mesh-for-data/mesh-for-data/pkg/multicluster"
 	local "github.com/mesh-for-data/mesh-for-data/pkg/multicluster/local"

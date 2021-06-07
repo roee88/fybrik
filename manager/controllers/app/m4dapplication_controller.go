@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mesh-for-data/mesh-for-data/pkg/connectors"
+	connectors "github.com/mesh-for-data/mesh-for-data/pkg/connectors/clients"
 	pb "github.com/mesh-for-data/mesh-for-data/pkg/connectors/protobuf"
 
 	"emperror.dev/errors"

@@ -1,4 +1,4 @@
-package connectors_test
+package clients_test
 
 import (
 	"testing"

@@ -13,7 +13,7 @@ import (
 	"emperror.dev/errors"
 	corev1 "k8s.io/api/core/v1"
 
-	"github.com/mesh-for-data/mesh-for-data/pkg/connectors"
+	connectors "github.com/mesh-for-data/mesh-for-data/pkg/connectors/clients"
 	"github.com/mesh-for-data/mesh-for-data/pkg/multicluster"
 	"github.com/mesh-for-data/mesh-for-data/pkg/multicluster/local"
 	"github.com/mesh-for-data/mesh-for-data/pkg/multicluster/razee"

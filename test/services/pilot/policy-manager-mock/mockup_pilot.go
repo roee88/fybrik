@@ -13,7 +13,7 @@ import (
 	"time"
 
 	"emperror.dev/errors"
-	"github.com/mesh-for-data/mesh-for-data/pkg/connectors"
+	connectors "github.com/mesh-for-data/mesh-for-data/pkg/connectors/clients"
 	pb "github.com/mesh-for-data/mesh-for-data/pkg/connectors/protobuf"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
