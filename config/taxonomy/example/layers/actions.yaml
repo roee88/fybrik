@@ -1,0 +1,19 @@
+definitions:
+  Action:
+    oneOf:
+      - $ref: "#/definitions/RedactAction"
+      - $ref: "#/definitions/EncryptAction"
+  RedactAction:
+    type: object
+    properties:
+      columns:
+        items:
+          type: string
+        type: array
+    required:
+      - columns
+  EncryptAction:
+    type: object
+    properties:
+      algorithm:
+        type: string
