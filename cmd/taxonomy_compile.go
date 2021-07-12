@@ -42,7 +42,7 @@ func init() {
 	_ = compileCmd.MarkFlagFilename("base", "yaml", "yml", "json")
 	_ = compileCmd.MarkFlagRequired("base")
 
-	compileCmd.Flags().StringVarP(&taxonomyCompileOutPath, "out", "o", "taxonomy.json", "Path for output file (default \"taxonomy.json\")")
+	compileCmd.Flags().StringVarP(&taxonomyCompileOutPath, "out", "o", "taxonomy.json", "Path for output file")
 	_ = compileCmd.MarkFlagFilename("out", "yaml", "yml", "json")
 
 	compileCmd.Flags().BoolVar(&taxonomyCompileCodegen, "codegen", false,
