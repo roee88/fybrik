@@ -11,18 +11,18 @@
       
       
       <link rel="icon" href="../../static/logo.png">
-      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.0.5">
+      <meta name="generator" content="mkdocs-1.2.3, mkdocs-material-8.1.2">
     
     
       
-        <title>Using a Custom Taxonomy for Resource Validation - Fybrik</title>
+        <title>Background - Fybrik</title>
       
     
     
-      <link rel="stylesheet" href="../../assets/stylesheets/main.a617204b.min.css">
+      <link rel="stylesheet" href="../../assets/stylesheets/main.f7951f6f.min.css">
       
         
-        <link rel="stylesheet" href="../../assets/stylesheets/palette.9204c3b2.min.css">
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.e6a45f82.min.css">
         
           
           
@@ -64,7 +64,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#using-a-custom-taxonomy-for-resource-validation" class="md-skip">
+        <a href="#background" class="md-skip">
           Skip to content
         </a>
       
@@ -102,7 +102,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Using a Custom Taxonomy for Resource Validation
+              Background
             
           </span>
         </div>
@@ -516,6 +516,20 @@
 
             
           
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../concepts/config-policies/" class="md-nav__link">
+        Configuration Policies
+      </a>
+    </li>
+  
+
+            
+          
         </ul>
       </nav>
     </li>
@@ -573,7 +587,7 @@
   
     <li class="md-nav__item">
       <a href="../using-opa/" class="md-nav__link">
-        Using OPA
+        Using OPA for Data Governance
       </a>
     </li>
   
@@ -609,47 +623,9 @@
         
       
       
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          Using a Custom Taxonomy for Resource Validation
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
       <a href="./" class="md-nav__link md-nav__link--active">
-        Using a Custom Taxonomy for Resource Validation
+        Background
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#taxonomy-compile-cli-tool" class="md-nav__link">
-    Taxonomy Compile CLI tool
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#deploy-fybrik-with-custom-taxonomy" class="md-nav__link">
-    Deploy Fybrik with Custom Taxonomy
-  </a>
-  
-</li>
-      
-    </ul>
-  
-</nav>
       
     </li>
   
@@ -1031,28 +1007,6 @@
     
   
   
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#taxonomy-compile-cli-tool" class="md-nav__link">
-    Taxonomy Compile CLI tool
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#deploy-fybrik-with-custom-taxonomy" class="md-nav__link">
-    Deploy Fybrik with Custom Taxonomy
-  </a>
-  
-</li>
-      
-    </ul>
-  
 </nav>
                   </div>
                 </div>
@@ -1068,6 +1022,9 @@
 </a>
 
 
+<h1 id="background">Background</h1>
+<p>Fybrik acts as an orchestrator of independent components.  For example, the author of the data governance policy manager, which provides the governance decisions, and the components that enforce those decisions are not necessarily the same.  Thus, there is no common terminology between them.  Similarly, the data formats and protocols defined in the data catalog may be defined differently than the components used for reading/writing data.</p>
+<p>In order to enable all these independent components to be used in a single architecture, Fybrik provides a taxonomy.  It provides a mechanism for all the components to interact using a common dialect.</p>
 <h1 id="using-a-custom-taxonomy-for-resource-validation">Using a Custom Taxonomy for Resource Validation</h1>
 <p>The project defines a set of immutable structural JSON schemas, or "taxonomies" for resources deployed in Fybrik. 
 However, since the taxonomy is meant to be configurable, a <code>taxonomy.json</code> file is referenced from these schemas for any definition that is customizable.</p>
@@ -1189,10 +1146,10 @@ If this flag is not provided, Fybrik will use the default <code>taxonomy.json</c
     <div class="md-dialog" data-md-component="dialog">
       <div class="md-dialog__inner md-typeset"></div>
     </div>
-    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../assets/javascripts/workers/search.cefbb252.min.js", "version": {"provider": "mike"}}</script>
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs"], "translations": {"clipboard.copy": "Copy to clipboard", "clipboard.copied": "Copied to clipboard", "search.config.lang": "en", "search.config.pipeline": "trimmer, stopWordFilter", "search.config.separator": "[\\s\\-]+", "search.placeholder": "Search", "search.result.placeholder": "Type to start searching", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.term.missing": "Missing", "select.version.title": "Select version"}, "search": "../../assets/javascripts/workers/search.0bbba5b5.min.js", "version": {"provider": "mike"}}</script>
     
     
-      <script src="../../assets/javascripts/bundle.a5f8ea78.min.js"></script>
+      <script src="../../assets/javascripts/bundle.649a939e.min.js"></script>
       
     
   </body>
