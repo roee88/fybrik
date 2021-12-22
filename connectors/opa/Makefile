@@ -15,13 +15,13 @@ CATALOG_CONNECTOR_URL ?= "katalg-connector:50090"
 docker-all: docker-build docker-push 
 
 docker-build:
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -o opa-connector main.go
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -o opa-connector .
 	docker build . -t $(IMG)
 	rm opa-connector
 
 .PHONY: source-build
 source-build:
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -o opa-connector main.go
+	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 GO111MODULE=on go build -o opa-connector .
 
 .PHONY: deploy
 deploy:

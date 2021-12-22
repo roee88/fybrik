@@ -12,9 +12,11 @@ import (
 
 	app "fybrik.io/fybrik/manager/apis/app/v1alpha1"
 	pb "fybrik.io/fybrik/pkg/connectors/protobuf"
+	"fybrik.io/fybrik/pkg/model/catalog"
+	"fybrik.io/fybrik/pkg/model/taxonomy"
+	"fybrik.io/fybrik/pkg/serde"
 
 	"emperror.dev/errors"
-	datacatalogTaxonomyModels "fybrik.io/fybrik/pkg/taxonomy/model/datacatalog/base"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -47,8 +49,7 @@ func NewGrpcDataCatalog(name string, connectionURL string, connectionTimeout tim
 	}, nil
 }
 
-func (m *grpcDataCatalog) GetAssetInfo(
-	in *datacatalogTaxonomyModels.DataCatalogRequest, creds string) (*datacatalogTaxonomyModels.DataCatalogResponse, error) {
+func (m *grpcDataCatalog) GetAssetInfo(in *catalog.GetAssetRequest, creds string) (*catalog.GetAssetResponse, error) {
 	log.Println("open api request received for getting policy decisions: ", *in)
 	dataCatalogReq, _ := ConvertDataCatalogOpenAPIReqToGrpcReq(in, creds)
 	log.Println("grpc data catalog request to be used for getting asset info: ", dataCatalogReq)
@@ -88,21 +89,21 @@ func (m *grpcDataCatalog) Close() error {
 	return m.connection.Close()
 }
 
-func ConvertDataCatalogOpenAPIReqToGrpcReq(in *datacatalogTaxonomyModels.DataCatalogRequest, creds string) (*pb.CatalogDatasetRequest, error) {
+func ConvertDataCatalogOpenAPIReqToGrpcReq(in *catalog.GetAssetRequest, creds string) (*pb.CatalogDatasetRequest, error) {
 	dataCatalogReq := &pb.CatalogDatasetRequest{
-		CredentialPath: creds, DatasetId: in.GetAssetID()}
+		CredentialPath: creds, DatasetId: string(in.AssetID)}
 	log.Println("Constructed GRPC data catalog request: ", dataCatalogReq)
 
 	return dataCatalogReq, nil
 }
 
-func ConvertDataCatalogGrpcRespToOpenAPIResp(result *pb.CatalogDatasetInfo) (*datacatalogTaxonomyModels.DataCatalogResponse, error) {
+func ConvertDataCatalogGrpcRespToOpenAPIResp(result *pb.CatalogDatasetInfo) (*catalog.GetAssetResponse, error) {
 	// convert GRPC response to Open Api Response - start
-	resourceCols := make([]datacatalogTaxonomyModels.ResourceColumns, 0)
+	resourceCols := make([]catalog.ResourceColumn, 0)
 
 	for colName, compMetaData := range result.GetDetails().Metadata.GetComponentsMetadata() {
 		if compMetaData != nil {
-			rscCol1 := datacatalogTaxonomyModels.ResourceColumns{
+			rscCol1 := catalog.ResourceColumn{
 				Name: colName}
 			rsCalMap := make(map[string]interface{})
 			tags := compMetaData.GetTags()
@@ -133,16 +134,17 @@ func ConvertDataCatalogGrpcRespToOpenAPIResp(result *pb.CatalogDatasetInfo) (*da
 	}
 
 	tags := result.GetDetails().Metadata.DatasetTags
-	tagsInResponse := make(map[string]interface{})
+	tagsInResponse := taxonomy.Tags{}
+	tagsInResponse.Items = make(map[string]interface{}, len(tags))
 	for i := 0; i < len(tags); i++ {
-		tagsInResponse[tags[i]] = true
+		tagsInResponse.Items[tags[i]] = true
 	}
 
-	resourceMetaData := &datacatalogTaxonomyModels.Resource{
+	resourceMetaData := &catalog.ResourceMetadata{
 		Name:      result.GetDetails().Name,
 		Owner:     &result.GetDetails().DataOwner,
 		Geography: &result.GetDetails().Geo,
-		Tags:      &tagsInResponse,
+		Tags:      tagsInResponse,
 		Columns:   &resourceCols,
 	}
 
@@ -177,16 +179,18 @@ func ConvertDataCatalogGrpcRespToOpenAPIResp(result *pb.CatalogDatasetInfo) (*da
 		return nil, errors.New("error during unmarshal of dataStoreInfo")
 	}
 
-	connection := datacatalogTaxonomyModels.Connection{
-		Name:                 connectionName,
-		AdditionalProperties: additionalProp,
+	connection := taxonomy.Connection{
+		Name: taxonomy.ConnectionType(connectionName),
+		AdditionalProperties: serde.Properties{
+			Items: additionalProp,
+		},
 	}
 
-	details := datacatalogTaxonomyModels.Details{
+	details := catalog.ResourceDetails{
 		Connection: connection,
-		DataFormat: &result.GetDetails().DataFormat,
+		DataFormat: taxonomy.DataFormat(result.Details.DataFormat),
 	}
-	dataCatalogResp := &datacatalogTaxonomyModels.DataCatalogResponse{
+	dataCatalogResp := &catalog.GetAssetResponse{
 		ResourceMetadata: *resourceMetaData,
 		Details:          details,
 		Credentials:      result.GetDetails().CredentialsInfo.VaultSecretPath,

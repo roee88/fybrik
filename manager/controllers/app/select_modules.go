@@ -13,8 +13,9 @@ import (
 	"fybrik.io/fybrik/manager/controllers/utils"
 	"fybrik.io/fybrik/pkg/adminconfig"
 	"fybrik.io/fybrik/pkg/logging"
+	"fybrik.io/fybrik/pkg/model/policy"
+	"fybrik.io/fybrik/pkg/model/taxonomy"
 	"fybrik.io/fybrik/pkg/multicluster"
-	taxonomymodels "fybrik.io/fybrik/pkg/taxonomy/model/policymanager/base"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
@@ -32,7 +33,7 @@ type DataInfo struct {
 	// Workload cluster
 	WorkloadCluster multicluster.Cluster
 	// Governance actions to perform on this asset
-	Actions []taxonomymodels.Action
+	Actions []taxonomy.PolicyManagerAction
 }
 
 // Temporary hard-coded capability representing Actions of read/copy capability.
@@ -58,7 +59,7 @@ type Edge struct {
 // TODO(shlomitk1): add plugins/transformation capabilities to this structure
 type ResolvedEdge struct {
 	Edge
-	Actions              []taxonomymodels.Action
+	Actions              []taxonomy.PolicyManagerAction
 	Cluster              string
 	StorageAccountRegion string
 }
@@ -105,15 +106,15 @@ func (p *PlotterGenerator) validate(item *DataInfo, solution Solution, appContex
 	requiredActions := item.Actions
 	for ind := range solution.DataPath {
 		element := &solution.DataPath[ind]
-		element.Actions = []taxonomymodels.Action{}
+		element.Actions = []taxonomy.PolicyManagerAction{}
 		moduleCapability := element.Module.Spec.Capabilities[element.CapabilityIndex]
 		if !element.Edge.Sink.Virtual {
 			// storage is required, plus more actions on copy may be needed
 			for _, region := range p.StorageAccountRegions {
 				// query the policy manager whether WRITE operation is allowed
-				operation := new(taxonomymodels.PolicyManagerRequestAction)
-				operation.SetActionType(taxonomymodels.WRITE)
-				operation.SetDestination(region)
+				operation := new(policy.RequestAction)
+				operation.ActionType = policy.WRITE
+				operation.Destination = region
 				actions, err := LookupPolicyDecisions(item.Context.DataSetID, p.PolicyManager, appContext, operation)
 				if err != nil && err.Error() == app.WriteNotAllowed {
 					continue
@@ -132,7 +133,7 @@ func (p *PlotterGenerator) validate(item *DataInfo, solution Solution, appContex
 			}
 		}
 		// read actions need to be handled somewhere on the path
-		unsupported := []taxonomymodels.Action{}
+		unsupported := []taxonomy.PolicyManagerAction{}
 		for _, action := range requiredActions {
 			if supportsGovernanceAction(&element.Edge, action) {
 				element.Actions = append(element.Actions, action)
@@ -269,7 +270,7 @@ func GetDependencies(module *app.FybrikModule, moduleMap map[string]*app.FybrikM
 }
 
 // SupportsGovernanceActions checks whether the module supports the required governance actions
-func supportsGovernanceActions(edge *Edge, actions []taxonomymodels.Action) bool {
+func supportsGovernanceActions(edge *Edge, actions []taxonomy.PolicyManagerAction) bool {
 	// Loop over the actions requested for the declared capability
 	for _, action := range actions {
 		// If any one of the actions is not supported, return false
@@ -281,7 +282,7 @@ func supportsGovernanceActions(edge *Edge, actions []taxonomymodels.Action) bool
 }
 
 // supportsGovernanceAction checks whether the module supports the required governance action
-func supportsGovernanceAction(edge *Edge, action taxonomymodels.Action) bool {
+func supportsGovernanceAction(edge *Edge, action taxonomy.PolicyManagerAction) bool {
 	// Loop over the data transforms (actions) performed by the module for this capability
 	capability := edge.Module.Spec.Capabilities[edge.CapabilityIndex]
 	for _, act := range capability.Actions {
@@ -375,13 +376,4 @@ func validateClusterRestrictionsPerCapability(item *DataInfo, capability string,
 		}
 	}
 	return true
-}
-
-func createActionStructure(actions []taxonomymodels.Action) []app.SupportedAction {
-	result := []app.SupportedAction{}
-	for _, action := range actions {
-		supportedAction := app.SupportedAction{Action: action}
-		result = append(result, supportedAction)
-	}
-	return result
 }
