@@ -77,7 +77,6 @@ func (m *grpcDataCatalog) GetAssetInfo(in *catalog.GetAssetRequest, creds string
 	}
 	log.Println("Marshalled value of data catalog response: ", string(res))
 	return dataCatalogResp, nil
-	// return result, err
 }
 
 func (m *grpcDataCatalog) RegisterDatasetInfo(ctx context.Context, in *pb.RegisterAssetRequest) (*pb.RegisterAssetResponse, error) {
@@ -103,33 +102,33 @@ func ConvertDataCatalogGrpcRespToOpenAPIResp(result *pb.CatalogDatasetInfo) (*ca
 
 	for colName, compMetaData := range result.GetDetails().Metadata.GetComponentsMetadata() {
 		if compMetaData != nil {
-			rscCol1 := catalog.ResourceColumn{
+			rscCol := catalog.ResourceColumn{
 				Name: colName}
-			rsCalMap := make(map[string]interface{})
+			rsColMap := make(map[string]interface{})
 			tags := compMetaData.GetTags()
 			for i := 0; i < len(tags); i++ {
-				rsCalMap[tags[i]] = true
+				rsColMap[tags[i]] = true
 			}
 
-			responseBytes, errJSON := json.MarshalIndent(rsCalMap, "", "\t")
+			responseBytes, errJSON := json.MarshalIndent(rsColMap, "", "\t")
 			if errJSON != nil {
 				return nil, fmt.Errorf("error Marshalling in ConvertDataCatalogGrpcRespToOpenAPIResp: %v", errJSON)
 			}
 			log.Print("responseBytes after MarshalIndent in ConvertDataCatalogGrpcRespToOpenAPIResp:" + string(responseBytes))
 
-			if err := json.Unmarshal(responseBytes, &rscCol1.Tags); err != nil {
+			if err := json.Unmarshal(responseBytes, &rscCol.Tags); err != nil {
 				return nil, fmt.Errorf("error UnMarshalling in ConvertDataCatalogGrpcRespToOpenAPIResp: %v", errJSON)
 			}
 
 			// just printing - start
-			responseBytes1, errJSON := json.MarshalIndent(rscCol1, "", "\t")
+			responseBytes, errJSON = json.MarshalIndent(rscCol, "", "\t")
 			if errJSON != nil {
 				return nil, fmt.Errorf("error Marshalling in ConvertDataCatalogGrpcRespToOpenAPIResp: %v", errJSON)
 			}
-			log.Print("responseBytes after MarshalIndent in ConvertDataCatalogGrpcRespToOpenAPIResp:" + string(responseBytes1))
+			log.Print("responseBytes after MarshalIndent in ConvertDataCatalogGrpcRespToOpenAPIResp:" + string(responseBytes))
 			// just printing - end
 
-			resourceCols = append(resourceCols, rscCol1)
+			resourceCols = append(resourceCols, rscCol)
 		}
 	}
 
