@@ -687,10 +687,57 @@
   
   
   
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2" type="checkbox" id="__nav_5_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_5_2">
+          Connectors API
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Connectors API" data-md-level="2">
+        <label class="md-nav__title" for="__nav_5_2">
+          <span class="md-nav__icon md-icon"></span>
+          Connectors API
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
     <li class="md-nav__item">
-      <a href="../../reference/connectors/" class="md-nav__link">
-        Connectors API
+      <a href="../../reference/connectors-datacatalog/" class="md-nav__link">
+        Data catalog
       </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/connectors-policymanager/" class="md-nav__link">
+        Policy manager
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
     </li>
   
 
@@ -1150,7 +1197,7 @@ the following environment variables can be set:
 <div class="highlight"><pre><span></span><code><span class="nv">NO_SIMULATED_PROGRESS</span><span class="o">=</span><span class="nb">true</span> <span class="nv">USE_EXISTING_CLUSTER</span><span class="o">=</span><span class="nb">true</span> make -C manager <span class="nb">test</span>
 </code></pre></div></p>
 <p>Please be aware that the controller is running locally in this case! If a controller is already deployed onto the
-cluster then the tests can be run with the command below. This will ensure that the tests are only creating CRDs on 
+cluster then the tests can be run with the command below. This will ensure that the tests are only creating custom resources on 
 the cluster and checking their status:
 <div class="highlight"><pre><span></span><code><span class="nv">USE_EXISTING_CONTROLLER</span><span class="o">=</span><span class="nb">true</span> <span class="nv">NO_SIMULATED_PROGRESS</span><span class="o">=</span><span class="nb">true</span> <span class="nv">USE_EXISTING_CLUSTER</span><span class="o">=</span><span class="nb">true</span> make -C manager <span class="nb">test</span>
 </code></pre></div></p>

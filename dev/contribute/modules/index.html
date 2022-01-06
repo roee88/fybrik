@@ -687,10 +687,57 @@
   
   
   
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+      
+        <input class="md-nav__toggle md-toggle" data-md-toggle="__nav_5_2" type="checkbox" id="__nav_5_2" >
+      
+      
+      
+      
+        <label class="md-nav__link" for="__nav_5_2">
+          Connectors API
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <nav class="md-nav" aria-label="Connectors API" data-md-level="2">
+        <label class="md-nav__title" for="__nav_5_2">
+          <span class="md-nav__icon md-icon"></span>
+          Connectors API
+        </label>
+        <ul class="md-nav__list" data-md-scrollfix>
+          
+            
+              
+  
+  
+  
     <li class="md-nav__item">
-      <a href="../../reference/connectors/" class="md-nav__link">
-        Connectors API
+      <a href="../../reference/connectors-datacatalog/" class="md-nav__link">
+        Data catalog
       </a>
+    </li>
+  
+
+            
+          
+            
+              
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../reference/connectors-policymanager/" class="md-nav__link">
+        Policy manager
+      </a>
+    </li>
+  
+
+            
+          
+        </ul>
+      </nav>
     </li>
   
 
@@ -1340,7 +1387,7 @@ helm package &lt;chart folder&gt; -d &lt;local-chart-path&gt;
 helm push &lt;local-chart-path&gt; oci://&lt;registry&gt;/&lt;path&gt;
 </code></pre></div>
 <h2 id="fybrikmodule-yaml">FybrikModule YAML</h2>
-<p><code>FybrikModule</code> is a kubernetes Custom Resource Definition (CRD) which describes to the control plane the functionality provided by the module.  The FybrikModule CRD has no controller. The specification of the <code>FybrikModule</code> Kubernetes CRD is available in the <a href="../../reference/crds/#fybrikmodule">API documentation</a>. </p>
+<p><code>FybrikModule</code> is a kubernetes Custom Resource Definition (custom resource) which describes to the control plane the functionality provided by the module.  The FybrikModule custom resource has no controller. The specification of the <code>FybrikModule</code> Kubernetes custom resource is available in the <a href="../../reference/crds/#fybrikmodule">API documentation</a>. </p>
 <p>The YAML file begins with standard Kubernetes metadata followed by the <code>FybrikModule</code> specification:
 <div class="highlight"><pre><span></span><code><span class="nt">apiVersion</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">app.fybrik.io/v1alpha1</span><span class="w"> </span><span class="c1"># always this value</span><span class="w"></span>
 <span class="nt">kind</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">FybrikModule</span><span class="w"> </span><span class="c1"># always this value</span><span class="w"></span>
@@ -1469,7 +1516,7 @@ a module that does not perform any transformation on the data may omit the <code
 <h2 id="getting-started">Getting Started</h2>
 <p>In order to help module developers get started there are two example "hello world" modules:
 * <a href="https://github.com/fybrik/hello-world-module">Hello world module</a>
-* <a href="https://github.com/fybrik/hello-world-read-module">Hellow world read module</a></p>
+* <a href="https://github.com/fybrik/hello-world-read-module">Hello world read module</a></p>
 <p>An example of a fully functional module is the [arrow flight module][https://github.com/fybrik/arrow-flight-module]</p>
 <h2 id="test">Test</h2>
 <ol>
